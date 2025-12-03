@@ -22,7 +22,7 @@
   silly: 6
   })]
 
-- [ ] Error handling setup
+- [ Done ] Error handling setup [npm i http-errors]
 - [ ] Tests setup
 - [ ] Create template
 
