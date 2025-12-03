@@ -7,6 +7,8 @@
     "dev": "node dist/server.js",
     "format:fix": "npx prettier . --write \"src/**/*.ts\"",
     "format:check": "npx prettier . --check \"src/**/*.ts\"",
+    "lint:fix": "npx eslint . --fix",
+    "lint:check": "npx eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -16,8 +18,11 @@
   "author": "Koushik",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
     "prettier": "3.7.4",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.1"
   }
 }

@@ -7,7 +7,8 @@
 - [ Done ] Node.js project setup [npm init]
 - [ Done ] TypeScript setup [npm i -D typescript,npx tsc --init(create tsconfig.js) , npm i -D @types/node ]
 - [ Done ] Prettier setup [ npm install --save-dev --save-exact prettier , npx prettier . --write ]
-- [ ] Eslint setup
+- [ Done ] Eslint setup [npm install --save-dev eslint @eslint/js  typescript-eslint ,   "lint:fix": "npx eslint . --fix",
+    "lint:check": "npx eslint ."]
 - [ ] Git hooks setup
 - [ ] Application config setup
 - [ ] Express.js app setup
