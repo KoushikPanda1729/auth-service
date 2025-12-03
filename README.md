@@ -3,7 +3,7 @@
 ## Setup Tasks
 
 - [ Done ] Git setup
-- [ ] Node.js version manager setup
+- [ Done ] Node.js version manager setup
 - [ ] Node.js project setup
 - [ ] TypeScript setup
 - [ ] Prettier setup
