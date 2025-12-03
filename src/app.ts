@@ -8,8 +8,8 @@ import type { HttpError } from "http-errors";
 
 const app = express();
 
-app.get("/", (req, res) => {
-    res.send("Wellcome to auth service");
+app.get("/", (req: Request, res: Response) => {
+    res.status(200).send("Wellcome to auth service");
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

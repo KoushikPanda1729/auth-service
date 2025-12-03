@@ -23,7 +23,7 @@
   })]
 
 - [ Done ] Error handling setup [npm i http-errors]
-- [ ] Tests setup
+- [ Done ] Tests setup [npm install --save-dev jest, npm install --save-dev ts-jest , npx ts-jest config:init, npm install --save-dev @types/jest, npm i supertest, npm i -D @types/supertest ]
 - [ ] Create template
 
 ## Progress Tracking
