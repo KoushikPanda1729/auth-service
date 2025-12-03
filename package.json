@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "The user management service ",
     "main": "index.js",
+    "type": "module",
     "scripts": {
         "dev": "node dist/server.js",
         "format:fix": "npx prettier . --write \"src/**/*.ts\"",
@@ -33,5 +34,8 @@
             "npm run format:fix",
             "npm run lint:fix"
         ]
+    },
+    "dependencies": {
+        "dotenv": "^17.2.3"
     }
 }

@@ -10,7 +10,7 @@
 - [ Done ] Eslint setup [npm install --save-dev eslint @eslint/js typescript-eslint , "lint:fix": "npx eslint . --fix",
   "lint:check": "npx eslint ."]
 - [ Done ] Git hooks setup [npm install --save-dev husky ,npx husky init , npm install --save-dev lint-staged (Used for only staged file checked) ]
-- [ ] Application config setup
+- [ Done ] Application config setup [npm i dotenv]
 - [ ] Express.js app setup
 - [ ] Logger setup
 - [ ] Error handling setup
