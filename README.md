@@ -11,7 +11,7 @@
   "lint:check": "npx eslint ."]
 - [ Done ] Git hooks setup [npm install --save-dev husky ,npx husky init , npm install --save-dev lint-staged (Used for only staged file checked) ]
 - [ Done ] Application config setup [npm i dotenv]
-- [ ] Express.js app setup
+- [ Done ] Express.js app setup
 - [ ] Logger setup
 - [ ] Error handling setup
 - [ ] Tests setup
