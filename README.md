@@ -4,7 +4,7 @@
 
 - [ Done ] Git setup
 - [ Done ] Node.js version manager setup
-- [ ] Node.js project setup
+- [ Done ] Node.js project setup
 - [ ] TypeScript setup
 - [ ] Prettier setup
 - [ ] Eslint setup
