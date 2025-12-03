@@ -3,9 +3,9 @@
 ## Setup Tasks
 
 - [ Done ] Git setup
-- [ Done ] Node.js version manager setup
-- [ Done ] Node.js project setup
-- [ ] TypeScript setup
+- [ Done ] Node.js version manager setup [nvm install (if not install) , nvm use (this command use the .nvmrc version)]
+- [ Done ] Node.js project setup [npm init]
+- [ Done ] TypeScript setup [npm i -D typescript,npx tsc --init(create tsconfig.js) , npm i -D @types/node ]
 - [ ] Prettier setup
 - [ ] Eslint setup
 - [ ] Git hooks setup
