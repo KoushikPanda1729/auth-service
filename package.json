@@ -7,9 +7,10 @@
     "dev": "node dist/server.js",
     "format:fix": "npx prettier . --write \"src/**/*.ts\"",
     "format:check": "npx prettier . --check \"src/**/*.ts\"",
-    "lint:fix": "npx eslint . --fix",
-    "lint:check": "npx eslint .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint:fix": "npx eslint . --fix \"src/**/*.ts\"",
+    "lint:check": "npx eslint . \"src/**/*.ts\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
   },
   "keywords": [
     "Auth",
@@ -21,8 +22,17 @@
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "3.7.4",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.1"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "npm run format:fix",
+      "npm run lint:fix"
+    ]
   }
+  
 }

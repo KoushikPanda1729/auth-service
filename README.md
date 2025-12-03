@@ -9,7 +9,7 @@
 - [ Done ] Prettier setup [ npm install --save-dev --save-exact prettier , npx prettier . --write ]
 - [ Done ] Eslint setup [npm install --save-dev eslint @eslint/js  typescript-eslint ,   "lint:fix": "npx eslint . --fix",
     "lint:check": "npx eslint ."]
-- [ ] Git hooks setup
+- [ Done ] Git hooks setup [npm install --save-dev husky ,npx husky init , npm install --save-dev lint-staged  (Used for only staged file checked) ]
 - [ ] Application config setup
 - [ ] Express.js app setup
 - [ ] Logger setup
