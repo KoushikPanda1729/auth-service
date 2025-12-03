@@ -1,14 +1,15 @@
 import app from "./app";
 import { Config } from "./config/index";
+import logger from "./config/logger";
 
 const startServer = () => {
     const { PORT } = Config;
     try {
         app.listen(PORT, () =>
-            console.log(`Auth service running on port ${PORT}`)
+            logger.info(`Server is running on port ${PORT}`)
         );
     } catch (error) {
-        console.error("Error starting server:", error);
+        logger.error("Error starting server:", { error });
         process.exit(1);
     }
 };

@@ -12,7 +12,16 @@
 - [ Done ] Git hooks setup [npm install --save-dev husky ,npx husky init , npm install --save-dev lint-staged (Used for only staged file checked) ]
 - [ Done ] Application config setup [npm i dotenv]
 - [ Done ] Express.js app setup
-- [ ] Logger setup
+- [ Done ] Logger setup [npm i winston , and the order is like this ({
+  error: 0,
+  warn: 1,
+  info: 2,
+  http: 3,
+  verbose: 4,
+  debug: 5,
+  silly: 6
+  })]
+
 - [ ] Error handling setup
 - [ ] Tests setup
 - [ ] Create template
