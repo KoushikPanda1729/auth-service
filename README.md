@@ -6,7 +6,7 @@
 - [ Done ] Node.js version manager setup [nvm install (if not install) , nvm use (this command use the .nvmrc version)]
 - [ Done ] Node.js project setup [npm init]
 - [ Done ] TypeScript setup [npm i -D typescript,npx tsc --init(create tsconfig.js) , npm i -D @types/node ]
-- [ ] Prettier setup
+- [ Done ] Prettier setup [ npm install --save-dev --save-exact prettier , npx prettier . --write ]
 - [ ] Eslint setup
 - [ ] Git hooks setup
 - [ ] Application config setup
