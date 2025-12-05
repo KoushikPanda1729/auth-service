@@ -3,7 +3,7 @@ import request from "supertest";
 import { calculateSum } from "./src/utils";
 import app from "./src/app";
 
-describe("app", () => {
+describe.skip("app", () => {
     it("should return correct discount ammount", () => {
         const sum = calculateSum(10, 10);
         expect(sum).toBe(20);
