@@ -12,7 +12,7 @@
         "target": "esnext",
         "types": [],
         // For nodejs:
-        // "lib": ["esnext"],
+        "lib": ["es6"],
         // "types": ["node"],
         // and npm install -D @types/node
         // Other Outputs
@@ -37,6 +37,8 @@
         "noUncheckedSideEffectImports": true,
         "moduleDetection": "force",
         "skipLibCheck": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
     }
 }

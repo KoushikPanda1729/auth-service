@@ -38,6 +38,18 @@ describe("Post /auth/register", () => {
                 expect.stringContaining("json")
             );
         });
+
+        it("should persists data in the database", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                email: "johe@gmail.com",
+                password: "Password1234",
+            };
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+        });
     });
     describe("Given all fields are invalid", () => {});
 });
