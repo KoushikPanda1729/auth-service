@@ -35,11 +35,9 @@
   ]
 
 - [ Done ] Test Driven Development
-- [ Done ] Running Postgres in a Docker Container [docker pull postgres  ,docker run --rm --name auth-service-pgcontainer -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -v auth-service-pgdata:/var/lib/postgresql
-      -p 5432:5432 -d postgres ] read also the postgres readme file 
-- [ Done ] Install and setup typeorm [npm i typeorm --save , npm i reflect-metadata --save, npm i pg --save(for postgres sql)]
-
-
+- [ Done ] Running Postgres in a Docker Container [docker pull postgres ,docker run --rm --name auth-service-pgcontainer -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -v auth-service-pgdata:/var/lib/postgresql
+  -p 5432:5432 -d postgres ] read also the postgres readme file
+- [ Done ] Install and setup typeorm [npm i typeorm --save , npm i reflect-metadata --save, npm i pg --save(for postgres sql), npx typeorm init --database postgres, npm install cross-env]
 
 ## Progress Tracking
 
