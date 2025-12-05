@@ -7,14 +7,12 @@
         "outDir": "./dist",
         // Environment Settings
         // See also https://aka.ms/tsconfig/module
-        "module": "ESNext",
-        "moduleResolution": "bundler",
-        "target": "esnext",
-        "types": [],
+        "module": "ES2022",
+        "moduleResolution": "Bundler",
+        "target": "ES2022",
         // For nodejs:
         "lib": ["es6"],
-        // "types": ["node"],
-        // and npm install -D @types/node
+        "types": ["node"],
         // Other Outputs
         "sourceMap": true,
         "declaration": true,

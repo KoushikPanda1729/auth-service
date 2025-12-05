@@ -10,7 +10,7 @@
         "format:check": "npx prettier . --check \"src/**/*.ts\"",
         "lint:fix": "npx eslint . --fix \"src/**/*.ts\"",
         "lint:check": "npx eslint . \"src/**/*.ts\"",
-        "test": "jest --watch --runInBand",
+        "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --watch --runInBand",
         "prepare": "husky"
     },
     "keywords": [

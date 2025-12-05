@@ -12,6 +12,7 @@ export default defineConfig(
             "**/*.config.mjs",
             "jest.config.js",
             "**/*.spec.ts",
+            "test/**",
         ],
     },
 
