@@ -3,6 +3,7 @@ import { AppDataSource } from "../config/data-source";
 import { User } from "../entity/User";
 import type { RegisterBody } from "../types";
 import createHttpError from "http-errors";
+import { roles } from "../constants";
 
 export class UserService {
     private userRepository: Repository<User>;
@@ -17,6 +18,7 @@ export class UserService {
                 lastName,
                 email,
                 password,
+                role: roles.CUSTOMER,
             });
             return user;
         } catch {

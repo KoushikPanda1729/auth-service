@@ -5,6 +5,7 @@ import { DataSource } from "typeorm";
 import { AppDataSource } from "../../src/config/data-source";
 import { User } from "../../src/entity/User";
 import { truncateTables } from "../utils";
+import { roles } from "../../src/constants";
 
 describe("Post /auth/register", () => {
     let connection: DataSource;
@@ -13,7 +14,8 @@ describe("Post /auth/register", () => {
     });
 
     beforeEach(async () => {
-        await truncateTables(connection);
+        await connection.dropDatabase();
+        await connection.synchronize();
     });
 
     afterAll(async () => {
@@ -46,6 +48,7 @@ describe("Post /auth/register", () => {
                 lastName: "Doe",
                 email: "johe@gmail.com",
                 password: "Password1234",
+                role: "customer",
             };
             const response = await request(app)
                 .post("/auth/register")
@@ -62,6 +65,7 @@ describe("Post /auth/register", () => {
                 lastName: "Doe",
                 email: "johe@gmail.com",
                 password: "Password1234",
+                role: "customer",
             };
             const response = await request(app)
                 .post("/auth/register")
@@ -70,6 +74,22 @@ describe("Post /auth/register", () => {
             const userRepository = connection.getRepository(User);
             const user = await userRepository.find();
             expect(user).toHaveLength(1);
+        });
+        it("should return the role of the usre", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                email: "johe@gmail.com",
+                password: "Password1234",
+                role: "customer",
+            };
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            const userRepository = connection.getRepository(User);
+            const user = await userRepository.find();
+            expect(user[0].role).toBe(roles.CUSTOMER);
         });
     });
     describe("Given all fields are invalid", () => {});

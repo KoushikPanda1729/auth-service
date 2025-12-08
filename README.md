@@ -40,6 +40,7 @@
 - [ Done ] Install and setup typeorm [npm i typeorm --save , npm i reflect-metadata --save, npm i pg --save(for postgres sql), npx typeorm init --database postgres, npm install cross-env]
 
 - [ Done ] Add error handling and logging
+- [ Done ] Add Role of users
 
 ## Progress Tracking
 

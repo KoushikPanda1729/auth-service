@@ -21,8 +21,10 @@ export class AuthController {
                 email,
                 password,
             });
-             
-            this.logger.info(`User registered successfully : ${user.id}`);
+
+            this.logger.info(
+                `User registered successfully , id :${user.id} and role: ${user.role}`
+            );
 
             res.status(201).json({});
         } catch (error) {
