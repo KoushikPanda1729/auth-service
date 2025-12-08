@@ -39,6 +39,8 @@
   -p 5432:5432 -d postgres ] read also the postgres readme file
 - [ Done ] Install and setup typeorm [npm i typeorm --save , npm i reflect-metadata --save, npm i pg --save(for postgres sql), npx typeorm init --database postgres, npm install cross-env]
 
+- [ Done ] Add error handling and logging
+
 ## Progress Tracking
 
 Use this checklist to track your progress while setting up the Express.js authentication service project.

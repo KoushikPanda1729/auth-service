@@ -1,16 +1,25 @@
-import { Router, type Request, type Response } from "express";
-import { AuthController } from "../controllers/AuthController";
-import { UserService } from "../services/userService";
+import {
+    Router,
+    type NextFunction,
+    type Request,
+    type Response,
+} from "express";
 import { AppDataSource } from "../config/data-source";
+import logger from "../config/logger";
+import { AuthController } from "../controllers/AuthController";
 import { User } from "../entity/User";
+import { UserService } from "../services/Userservice";
 
 const authRouter = Router();
 
-authRouter.post("/register", async (req: Request, res: Response) => {
-    const userRepository = AppDataSource.getRepository(User);
-    const userService = new UserService(userRepository);
-    const authController = new AuthController(userService);
-    return authController.register(req, res);
-});
+authRouter.post(
+    "/register",
+    async (req: Request, res: Response, next: NextFunction) => {
+        const userRepository = AppDataSource.getRepository(User);
+        const userService = new UserService(userRepository);
+        const authController = new AuthController(userService, logger);
+        return authController.register(req, res, next);
+    }
+);
 
 export default authRouter;
