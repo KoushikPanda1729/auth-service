@@ -90,6 +90,28 @@ describe("Post /auth/register", () => {
             const user = await userRepository.find();
             expect(user[0].role).toBe(roles.CUSTOMER);
         });
+
+        it("should return access and refresh tokens in cookies", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                email: "johe@gmail.com",
+                password: "Password1234",
+                role: "customer",
+            };
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            expect(response.headers["set-cookie"]).toBeDefined();
+            expect(response.headers["set-cookie"]).toEqual(
+                expect.arrayContaining([
+                    expect.stringContaining("accessToken"),
+                    expect.stringContaining("refreshToken"),
+                ])
+            );
+        });
+
         it("should store hashed password", async () => {
             const userData = {
                 firstName: "John",

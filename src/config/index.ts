@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -18,4 +19,8 @@ export const Config = {
     DB_USERNAME: DB_USERNAME,
     DB_PASSWORD: DB_PASSWORD,
     DB_NAME: DB_NAME,
+    PRIVATE_KEY: fs.readFileSync(
+        path.join(__dirname, "../../certs/private.pem"),
+        "utf-8"
+    ),
 };

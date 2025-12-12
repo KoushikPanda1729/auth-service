@@ -8,9 +8,12 @@ import logger from "./config/logger";
 import type { HttpError } from "http-errors";
 import authRouter from "./routes/auth";
 
+import cookieParser from "cookie-parser";
+
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", (req: Request, res: Response) => {
     res.status(200).send("Wellcome to auth service");

@@ -12,6 +12,8 @@ import { UserService } from "../services/Userservice";
 import { registerValidator } from "../validators/register-validator";
 import { validateRequest } from "../validators/validate-request";
 
+import { TokenService } from "../services/TokenService";
+
 const authRouter = Router();
 
 authRouter.post(
@@ -21,7 +23,12 @@ authRouter.post(
     async (req: Request, res: Response, next: NextFunction) => {
         const userRepository = AppDataSource.getRepository(User);
         const userService = new UserService(userRepository);
-        const authController = new AuthController(userService, logger);
+        const tokenService = new TokenService();
+        const authController = new AuthController(
+            userService,
+            logger,
+            tokenService
+        );
         return authController.register(req, res, next);
     }
 );
