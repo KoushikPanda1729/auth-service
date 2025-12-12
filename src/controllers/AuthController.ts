@@ -34,7 +34,8 @@ export class AuthController {
                 `User registered successfully , id :${user.id} and role: ${user.role}`
             );
             const accessToken = this.tokenService.generateAccessToken(user);
-            const refreshToken = this.tokenService.generateRefreshToken(user);
+            const refreshToken =
+                await this.tokenService.generateRefreshToken(user);
 
             res.cookie("accessToken", accessToken, {
                 httpOnly: true,

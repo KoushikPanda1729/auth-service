@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    OneToMany,
+    UpdateDateColumn,
+    CreateDateColumn,
+} from "typeorm";
+import { RefreshToken } from "./RefreshToken";
 
 @Entity()
 export class User {
@@ -19,4 +27,13 @@ export class User {
 
     @Column({ type: "varchar" })
     role!: string;
+
+    @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+    refreshTokens!: RefreshToken[];
+
+    @UpdateDateColumn()
+    updatedAt!: Date;
+
+    @CreateDateColumn()
+    createdAt!: Date;
 }

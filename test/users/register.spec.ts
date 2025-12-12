@@ -5,16 +5,24 @@ import app from "../../src/app";
 import { AppDataSource } from "../../src/config/data-source";
 import { roles } from "../../src/constants";
 import { User } from "../../src/entity/User";
+import { RefreshToken } from "../../src/entity/RefreshToken";
+import logger from "../../src/config/logger";
 
 describe("Post /auth/register", () => {
     let connection: DataSource;
+
     beforeAll(async () => {
         connection = await AppDataSource.initialize();
     });
 
     beforeEach(async () => {
-        await connection.dropDatabase();
-        await connection.synchronize();
+        const entities = connection.entityMetadatas;
+        const tableNames = entities
+            .map((entity) => `"${entity.tableName}"`)
+            .join(", ");
+        await connection.query(
+            `TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE;`
+        );
     });
 
     afterAll(async () => {
@@ -66,9 +74,7 @@ describe("Post /auth/register", () => {
                 password: "Password1234",
                 role: "customer",
             };
-            const response = await request(app)
-                .post("/auth/register")
-                .send(userData);
+            await request(app).post("/auth/register").send(userData);
 
             const userRepository = connection.getRepository(User);
             const user = await userRepository.find();
@@ -82,9 +88,7 @@ describe("Post /auth/register", () => {
                 password: "Password1234",
                 role: "customer",
             };
-            const response = await request(app)
-                .post("/auth/register")
-                .send(userData);
+            await request(app).post("/auth/register").send(userData);
 
             const userRepository = connection.getRepository(User);
             const user = await userRepository.find();
@@ -112,6 +116,86 @@ describe("Post /auth/register", () => {
             );
         });
 
+        it("should store the refresh token in the database", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                email: "johe@gmail.com",
+                password: "Password1234",
+                role: "customer",
+            };
+            await request(app).post("/auth/register").send(userData);
+
+            const refreshTokenRepository =
+                connection.getRepository(RefreshToken);
+            const tokens = await refreshTokenRepository.find({
+                relations: { user: true },
+            });
+
+            expect(tokens).toHaveLength(1);
+            expect(tokens[0].user).toBeDefined();
+        });
+
+        it("should retrieve refresh token with all properties", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                email: "johe@gmail.com",
+                password: "Password1234",
+                role: "customer",
+            };
+            await request(app).post("/auth/register").send(userData);
+
+            const refreshTokenRepository =
+                connection.getRepository(RefreshToken);
+            const tokens = await refreshTokenRepository.find({
+                relations: { user: true },
+            });
+
+            const token = tokens[0];
+
+            // Verify token properties
+            expect(token.id).toBeDefined();
+            expect(token.expiresAt).toBeInstanceOf(Date);
+            expect(token.expiresAt.getTime()).toBeGreaterThan(Date.now());
+            expect(token.createdAt).toBeInstanceOf(Date);
+            expect(token.updatedAt).toBeInstanceOf(Date);
+
+            // Verify user relationship
+            expect(token.user).toBeDefined();
+            expect(token.user.id).toBeDefined();
+            expect(token.user.email).toBe(userData.email);
+            expect(token.user.firstName).toBe(userData.firstName);
+            expect(token.user.lastName).toBe(userData.lastName);
+            expect(token.user.role).toBe(roles.CUSTOMER);
+        });
+
+        it("should retrieve refresh token by user id", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                email: "johe@gmail.com",
+                password: "Password1234",
+                role: "customer",
+            };
+            await request(app).post("/auth/register").send(userData);
+
+            const userRepository = connection.getRepository(User);
+            const user = await userRepository.findOne({
+                where: { email: userData.email },
+            });
+
+            const refreshTokenRepository =
+                connection.getRepository(RefreshToken);
+            const tokens = await refreshTokenRepository.find({
+                where: { user: { id: user!.id } },
+                relations: { user: true },
+            });
+
+            expect(tokens).toHaveLength(1);
+            expect(tokens[0].user.id).toBe(user!.id);
+        });
+
         it("should store hashed password", async () => {
             const userData = {
                 firstName: "John",
@@ -120,14 +204,11 @@ describe("Post /auth/register", () => {
                 password: "Password1234",
                 role: "customer",
             };
-            const response = await request(app)
-                .post("/auth/register")
-                .send(userData);
+            await request(app).post("/auth/register").send(userData);
 
             const userRepository = connection.getRepository(User);
             const user = await userRepository.find();
             expect(user[0].password).not.toBe(userData.password);
-            console.log(user[0].password);
         });
 
         it("should return 400 if email is already registered", async () => {
