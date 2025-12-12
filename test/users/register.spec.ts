@@ -1,11 +1,10 @@
 import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
-import app from "../../src/app";
 import { DataSource } from "typeorm";
+import app from "../../src/app";
 import { AppDataSource } from "../../src/config/data-source";
-import { User } from "../../src/entity/User";
-import { truncateTables } from "../utils";
 import { roles } from "../../src/constants";
+import { User } from "../../src/entity/User";
 
 describe("Post /auth/register", () => {
     let connection: DataSource;
@@ -90,6 +89,39 @@ describe("Post /auth/register", () => {
             const userRepository = connection.getRepository(User);
             const user = await userRepository.find();
             expect(user[0].role).toBe(roles.CUSTOMER);
+        });
+        it("should store hashed password", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                email: "johe@gmail.com",
+                password: "Password1234",
+                role: "customer",
+            };
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            const userRepository = connection.getRepository(User);
+            const user = await userRepository.find();
+            expect(user[0].password).not.toBe(userData.password);
+            console.log(user[0].password);
+        });
+
+        it("should return 400 if email is already registered", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                email: "johe@gmail.com",
+                password: "Password1234",
+                role: "customer",
+            };
+            const userRepository = connection.getRepository(User);
+            await userRepository.save({ ...userData, role: roles.CUSTOMER });
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+            expect(response.statusCode).toBe(400);
         });
     });
     describe("Given all fields are invalid", () => {});

@@ -1,10 +1,9 @@
-import bcrypt from "bcrypt";
+import * as bcrypt from "bcrypt";
+import createHttpError from "http-errors";
 import type { Repository } from "typeorm";
-import { AppDataSource } from "../config/data-source";
+import { roles } from "../constants";
 import { User } from "../entity/User";
 import type { RegisterBody } from "../types";
-import createHttpError from "http-errors";
-import { roles } from "../constants";
 
 export class UserService {
     private userRepository: Repository<User>;
@@ -12,20 +11,11 @@ export class UserService {
         this.userRepository = userRepository;
     }
     async create({ firstName, lastName, email, password }: RegisterBody) {
-        const userRepository = AppDataSource.getRepository(User);
-        const user = await userRepository.findOne({
-            where: { email },
-        });
-
-        if (user) {
-            const error = createHttpError(400, "Email already exists!");
-            throw error;
-        }
-
         try {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
-            const user = await userRepository.save({
+
+            const user = await this.userRepository.save({
                 firstName,
                 lastName,
                 email,

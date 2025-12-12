@@ -15,4 +15,5 @@ export default {
             },
         ],
     },
+    maxWorkers: 1, // Run tests serially to avoid database race conditions
 };

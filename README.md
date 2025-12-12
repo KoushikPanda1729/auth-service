@@ -41,6 +41,7 @@
 
 - [ Done ] Add error handling and logging
 - [ Done ] Add Role of users
+- [ Done ] Add test for unique email and hash password
 
 ## Progress Tracking
 
