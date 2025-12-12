@@ -124,5 +124,18 @@ describe("Post /auth/register", () => {
             expect(response.statusCode).toBe(400);
         });
     });
-    describe("Given all fields are invalid", () => {});
+    describe("Given all fields are invalid", () => {
+        it("should return 400 if email is missing", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                password: "Password1234",
+                role: "customer",
+            };
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+            expect(response.statusCode).toBe(400);
+        });
+    });
 });

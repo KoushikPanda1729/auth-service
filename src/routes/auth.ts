@@ -9,11 +9,15 @@ import logger from "../config/logger";
 import { AuthController } from "../controllers/AuthController";
 import { User } from "../entity/User";
 import { UserService } from "../services/Userservice";
+import { registerValidator } from "../validators/register-validator";
+import { validateRequest } from "../validators/validate-request";
 
 const authRouter = Router();
 
 authRouter.post(
     "/register",
+    registerValidator,
+    validateRequest,
     async (req: Request, res: Response, next: NextFunction) => {
         const userRepository = AppDataSource.getRepository(User);
         const userService = new UserService(userRepository);
