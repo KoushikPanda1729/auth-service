@@ -44,6 +44,7 @@
 - [ Done ] Add test for unique email and hash password
 - [ Done ] Add email field validation
 - [ Done ] Add Sanitizing Request Fields
+- [ Done ] Add improvemtn of token service
 
 ## Progress Tracking
 
