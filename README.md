@@ -43,6 +43,7 @@
 - [ Done ] Add Role of users
 - [ Done ] Add test for unique email and hash password
 - [ Done ] Add email field validation
+- [ Done ] Add Sanitizing Request Fields
 
 ## Progress Tracking
 

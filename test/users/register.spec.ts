@@ -136,6 +136,64 @@ describe("Post /auth/register", () => {
                 .post("/auth/register")
                 .send(userData);
             expect(response.statusCode).toBe(400);
+            expect(response.body.errors[0].message).toBe("Email is required");
+        });
+
+        it("should return 400 if firstName is missing", async () => {
+            const userData = {
+                lastName: "Doe",
+                email: "john@gmail.com",
+                password: "Password1234",
+                role: "customer",
+            };
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+            expect(response.statusCode).toBe(400);
+            expect(response.body.errors[0].message).toBe(
+                "First name is required"
+            );
+        });
+
+        it("should return 400 if password is weak", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                email: "john@gmail.com",
+                password: "123",
+                role: "customer",
+            };
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+            expect(response.statusCode).toBe(400);
+            expect(response.body.errors[0].message).toBe(
+                "Password should be at least 8 chars"
+            );
+        });
+    });
+
+    describe("Given fields requiring trimming", () => {
+        it("should trim email before checking uniqueness or saving", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                email: "  john_trim@gmail.com  ",
+                password: "Password1234",
+                role: "customer",
+            };
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+
+            expect(response.statusCode).toBe(201);
+
+            const userRepository = connection.getRepository(User);
+            const user = await userRepository.findOne({
+                where: { email: "john_trim@gmail.com" },
+            });
+            expect(user).not.toBeNull();
+            expect(user!.email).toBe("john_trim@gmail.com");
         });
     });
 });
