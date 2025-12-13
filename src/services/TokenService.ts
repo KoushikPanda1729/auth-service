@@ -37,8 +37,8 @@ export class TokenService {
             role: user.role,
             id: refreshToken.id,
         };
-        const token = jwt.sign(payload, Config.PRIVATE_KEY, {
-            algorithm: "RS256",
+        const token = jwt.sign(payload, Config.REFRESH_TOKEN_SECRET, {
+            algorithm: "HS256",
             expiresIn: "1y",
             jwtid: String(refreshToken.id),
         });
@@ -61,8 +61,8 @@ export class TokenService {
 
     verifyRefreshToken(token: string): AuthPayload {
         try {
-            const payload = jwt.verify(token, Config.PUBLIC_KEY, {
-                algorithms: ["RS256"],
+            const payload = jwt.verify(token, Config.REFRESH_TOKEN_SECRET, {
+                algorithms: ["HS256"],
             }) as JwtPayload;
 
             const authPayload: AuthPayload = {

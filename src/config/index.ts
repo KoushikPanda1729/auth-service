@@ -18,6 +18,7 @@ const {
     DB_NAME,
     FRONTEND_URL,
     JWKS_URI,
+    REFRESH_TOKEN_SECRET,
 } = process.env;
 
 export const Config = {
@@ -30,6 +31,7 @@ export const Config = {
     DB_NAME: DB_NAME,
     FRONTEND_URL: FRONTEND_URL,
     JWKS_URI: JWKS_URI,
+    REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET || "",
     PRIVATE_KEY: fs.readFileSync(
         path.join(__dirname, "../../certs/private.pem"),
         "utf-8"

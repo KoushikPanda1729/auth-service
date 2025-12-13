@@ -15,6 +15,7 @@ import { validateRequest } from "../validators/validate-request";
 import { RefreshToken } from "../entity/RefreshToken";
 import { TokenService } from "../services/TokenService";
 import { authenticate } from "../middleware/authenticate";
+import { validateRefreshToken } from "../middleware/validateRefreshToken";
 import rateLimit from "express-rate-limit";
 import createHttpError from "http-errors";
 
@@ -59,8 +60,11 @@ authRouter.post(
         authController.login(req, res, next)
 );
 
-authRouter.post("/refresh", (req: Request, res: Response, next: NextFunction) =>
-    authController.refresh(req, res, next)
+authRouter.post(
+    "/refresh",
+    validateRefreshToken,
+    (req: Request, res: Response, next: NextFunction) =>
+        authController.refresh(req, res, next)
 );
 
 authRouter.post(

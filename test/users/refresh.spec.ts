@@ -196,7 +196,7 @@ describe("POST /auth/refresh", () => {
 
             expect(response.statusCode).toBe(401);
             expect(response.body.errors[0].message).toBe(
-                "Refresh token required"
+                "No authorization token was found"
             );
         });
 
