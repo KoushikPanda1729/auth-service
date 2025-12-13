@@ -25,7 +25,7 @@
 - [ Done ] Error handling setup [npm i http-errors]
 - [ Done ] Tests setup [npm install --save-dev jest, npm install --save-dev ts-jest , npx ts-jest config:init, npm install --save-dev @types/jest, npm i supertest, npm i -D @types/supertest ]
 - [ Done ] Create template [git remote add template git@github.com-first:KoushikPanda1729/microservice_template.git , git push template main]
-- [ Done ] Basic of conainerizing express app [docker build -t auth-service:dev -f ddocker/dev/Dockerfile . , docker run --rm -it -v "$(pwd):/usr/src/app" -v /usr/src/app/node_modules --env-file .env -p 5501:5501 -e
+- [ Done ] Basic of conainerizing express app [docker build -t auth-service:dev -f docker/dev/Dockerfile . , docker run --rm -it -v "$(pwd):/usr/src/app" -v /usr/src/app/node_modules --env-file .env -p 5501:5501 -e
   NODE_ENV=development auth-service:dev ||| docker run --rm -it \
   -v "$(pwd):/usr/src/app" \
    -v /usr/src/app/node_modules \

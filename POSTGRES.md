@@ -372,3 +372,19 @@ DB_USER=root
 DB_PASSWORD=root
 DB_NAME=auth_service
 ```
+
+## View the table data (user)
+
+```
+  SELECT * FROM "user";
+
+  (Note: The table name is "user" in quotes because it's a reserved keyword in PostgreSQL)
+
+  If you want to see just specific columns or limit the results:
+
+  -- See specific columns
+  SELECT id, email, role, "firstName", "lastName" FROM "user";
+
+  -- Count total users
+  SELECT COUNT(*) FROM "user";
+```

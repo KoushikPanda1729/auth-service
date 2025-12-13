@@ -8,8 +8,16 @@ const __dirname = path.dirname(__filename);
 
 config({ path: path.join(__dirname, `../../.env.${process.env.NODE_ENV}`) });
 
-const { PORT, NODE_ENV, DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME } =
-    process.env;
+const {
+    PORT,
+    NODE_ENV,
+    DB_HOST,
+    DB_PORT,
+    DB_USERNAME,
+    DB_PASSWORD,
+    DB_NAME,
+    FRONTEND_URL,
+} = process.env;
 
 export const Config = {
     PORT: PORT,
@@ -19,8 +27,13 @@ export const Config = {
     DB_USERNAME: DB_USERNAME,
     DB_PASSWORD: DB_PASSWORD,
     DB_NAME: DB_NAME,
+    FRONTEND_URL: FRONTEND_URL || "http://localhost:3000",
     PRIVATE_KEY: fs.readFileSync(
         path.join(__dirname, "../../certs/private.pem"),
+        "utf-8"
+    ),
+    PUBLIC_KEY: fs.readFileSync(
+        path.join(__dirname, "../../certs/public.pem"),
         "utf-8"
     ),
 };

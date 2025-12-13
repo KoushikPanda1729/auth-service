@@ -1,0 +1,546 @@
+{
+    "info": {
+        "_postman_id": "auth-service-collection",
+        "name": "Auth Service API",
+        "description": "Complete authentication service API with JWT token management, user registration, login, logout, and token refresh functionality.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Health & Info",
+            "item": [
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/health",
+                            "host": ["{{base_url}}"],
+                            "path": ["health"]
+                        },
+                        "description": "Check service health and database connection status"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Root Endpoint",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/",
+                            "host": ["{{base_url}}"],
+                            "path": [""]
+                        },
+                        "description": "Welcome message from the auth service"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Register User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Save cookies automatically",
+                                    "if (pm.response.code === 201) {",
+                                    "    pm.test('Registration successful', function() {",
+                                    "        pm.response.to.have.status(201);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Response has user id', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('id');",
+                                    "        pm.environment.set('user_id', jsonData.id);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Cookies are set', function() {",
+                                    "        pm.expect(pm.cookies.has('accessToken')).to.be.true;",
+                                    "        pm.expect(pm.cookies.has('refreshToken')).to.be.true;",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"SecurePass123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/register",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "register"]
+                        },
+                        "description": "Register a new user account.\n\n**Requirements:**\n- Email must be unique and valid format\n- Password minimum 8 characters with uppercase, lowercase, number, and special character\n- All fields are required\n\n**Response:**\n- Sets httpOnly cookies: accessToken (1h) and refreshToken (1y)\n- Returns user ID"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"SecurePass123!\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/auth/register",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "register"]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n    \"id\": 1\n}"
+                        },
+                        {
+                            "name": "Email Already Exists",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"existing@example.com\",\n    \"password\": \"SecurePass123!\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/auth/register",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "register"]
+                                }
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"BadRequestError\",\n            \"message\": \"Email already exists!\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
+                        },
+                        {
+                            "name": "Weak Password",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"weak\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/auth/register",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "register"]
+                                }
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"ValidationError\",\n            \"message\": \"Password must contain at least 1 uppercase, 1 lowercase, 1 number and 1 special character\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Save cookies automatically",
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Login successful', function() {",
+                                    "        pm.response.to.have.status(200);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Response has user id', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('id');",
+                                    "        pm.environment.set('user_id', jsonData.id);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Cookies are set', function() {",
+                                    "        pm.expect(pm.cookies.has('accessToken')).to.be.true;",
+                                    "        pm.expect(pm.cookies.has('refreshToken')).to.be.true;",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"SecurePass123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "login"]
+                        },
+                        "description": "Login with email and password.\n\n**Rate Limiting:**\n- Maximum 5 failed attempts per 15 minutes per IP\n- Returns 429 when limit exceeded\n\n**Response:**\n- Sets httpOnly cookies: accessToken (1h) and refreshToken (1y)\n- Returns user ID\n- Stores new refresh token in database"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"SecurePass123!\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/auth/login",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "login"]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"id\": 1\n}"
+                        },
+                        {
+                            "name": "Invalid Credentials",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"email\": \"wrong@example.com\",\n    \"password\": \"WrongPass123!\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/auth/login",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "login"]
+                                }
+                            },
+                            "status": "Bad Request",
+                            "code": 400,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"BadRequestError\",\n            \"message\": \"Invalid credentials\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
+                        },
+                        {
+                            "name": "Rate Limited",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"WrongPass123!\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/auth/login",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "login"]
+                                }
+                            },
+                            "status": "Too Many Requests",
+                            "code": 429,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Too many authentication attempts, please try again later\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Refresh Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Token refreshed successfully', function() {",
+                                    "        pm.response.to.have.status(200);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('New cookies are set', function() {",
+                                    "        pm.expect(pm.cookies.has('accessToken')).to.be.true;",
+                                    "        pm.expect(pm.cookies.has('refreshToken')).to.be.true;",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/auth/refresh",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "refresh"]
+                        },
+                        "description": "Refresh access token using refresh token from cookies.\n\n**Token Rotation:**\n- Old refresh token is deleted from database\n- New refresh token is issued and stored\n- New access token is issued\n- Both tokens are set as httpOnly cookies\n\n**Security:**\n- Validates refresh token against database\n- Prevents token reuse (old token invalidated)\n- Checks token expiration"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/auth/refresh",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "refresh"]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"id\": 1\n}"
+                        },
+                        {
+                            "name": "Missing Refresh Token",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/auth/refresh",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "refresh"]
+                                }
+                            },
+                            "status": "Unauthorized",
+                            "code": 401,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"UnauthorizedError\",\n            \"message\": \"Refresh token required\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Logout",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Logout successful', function() {",
+                                    "        pm.response.to.have.status(200);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Success message returned', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData.message).to.eql('Logged out successfully');",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/auth/logout",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "logout"]
+                        },
+                        "description": "Logout and revoke refresh token.\n\n**Actions:**\n- Deletes refresh token from database\n- Clears accessToken and refreshToken cookies\n- Prevents token refresh (refresh token is revoked)\n\n**Note:**\n- Access tokens remain valid until expiry (JWT limitation)\n- To fully invalidate, implement a token blacklist"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/auth/logout",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "logout"]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"message\": \"Logged out successfully\"\n}"
+                        },
+                        {
+                            "name": "Unauthorized",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/auth/logout",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "logout"]
+                                }
+                            },
+                            "status": "Unauthorized",
+                            "code": 401,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"UnauthorizedError\",\n            \"message\": \"Authentication required\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Current User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('User info retrieved', function() {",
+                                    "        pm.response.to.have.status(200);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Response has user data', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('id');",
+                                    "        pm.expect(jsonData).to.have.property('email');",
+                                    "        pm.expect(jsonData).to.have.property('firstName');",
+                                    "        pm.expect(jsonData).to.have.property('lastName');",
+                                    "        pm.expect(jsonData).to.have.property('role');",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Password is not exposed', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.not.have.property('password');",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/auth/self",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "self"]
+                        },
+                        "description": "Get current authenticated user information.\n\n**Requires:**\n- Valid access token in cookies\n\n**Returns:**\n- User ID\n- First name\n- Last name\n- Email\n- Role\n\n**Security:**\n- Password is NOT included in response\n- Requires valid JWT access token"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/auth/self",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "self"]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"id\": 1,\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"role\": \"customer\"\n}"
+                        },
+                        {
+                            "name": "Unauthorized",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/auth/self",
+                                    "host": ["{{base_url}}"],
+                                    "path": ["auth", "self"]
+                                }
+                            },
+                            "status": "Unauthorized",
+                            "code": 401,
+                            "_postman_previewlanguage": "json",
+                            "header": [],
+                            "cookie": [],
+                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"UnauthorizedError\",\n            \"message\": \"Authentication required\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:5501",
+            "type": "string"
+        }
+    ]
+}

@@ -11,6 +11,7 @@ export class UserService {
     constructor(userRepository: Repository<User>) {
         this.userRepository = userRepository;
     }
+
     async create({ firstName, lastName, email, password }: RegisterBody) {
         const userRepository = AppDataSource.getRepository(User);
         const user = await userRepository.findOne({
@@ -37,5 +38,25 @@ export class UserService {
             const error = createHttpError(500, "Internal Server Error");
             throw error;
         }
+    }
+
+    async findByEmail(email: string): Promise<User | null> {
+        return await this.userRepository.findOne({
+            where: { email },
+        });
+    }
+
+    async findById(id: number): Promise<User | null> {
+        return await this.userRepository.findOne({
+            where: { id },
+            select: ["id", "firstName", "lastName", "email", "role"],
+        });
+    }
+
+    async comparePassword(
+        plainPassword: string,
+        hashedPassword: string
+    ): Promise<boolean> {
+        return await bcrypt.compare(plainPassword, hashedPassword);
     }
 }

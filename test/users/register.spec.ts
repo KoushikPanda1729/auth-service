@@ -37,7 +37,7 @@ describe("Post /auth/register", () => {
                 firstName: "John",
                 lastName: "Doe",
                 email: "john@gmail.com",
-                password: "Password1234",
+                password: "Password1234!",
             };
             //Act
             const response = await request(app)
@@ -54,7 +54,7 @@ describe("Post /auth/register", () => {
                 firstName: "John",
                 lastName: "Doe",
                 email: "johe@gmail.com",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             const response = await request(app)
@@ -71,7 +71,7 @@ describe("Post /auth/register", () => {
                 firstName: "John",
                 lastName: "Doe",
                 email: "johe@gmail.com",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             await request(app).post("/auth/register").send(userData);
@@ -85,7 +85,7 @@ describe("Post /auth/register", () => {
                 firstName: "John",
                 lastName: "Doe",
                 email: "johe@gmail.com",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             await request(app).post("/auth/register").send(userData);
@@ -100,7 +100,7 @@ describe("Post /auth/register", () => {
                 firstName: "John",
                 lastName: "Doe",
                 email: "johe@gmail.com",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             const response = await request(app)
@@ -121,7 +121,7 @@ describe("Post /auth/register", () => {
                 firstName: "John",
                 lastName: "Doe",
                 email: "johe@gmail.com",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             await request(app).post("/auth/register").send(userData);
@@ -141,7 +141,7 @@ describe("Post /auth/register", () => {
                 firstName: "John",
                 lastName: "Doe",
                 email: "johe@gmail.com",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             await request(app).post("/auth/register").send(userData);
@@ -175,7 +175,7 @@ describe("Post /auth/register", () => {
                 firstName: "John",
                 lastName: "Doe",
                 email: "johe@gmail.com",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             await request(app).post("/auth/register").send(userData);
@@ -201,7 +201,7 @@ describe("Post /auth/register", () => {
                 firstName: "John",
                 lastName: "Doe",
                 email: "johe@gmail.com",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             await request(app).post("/auth/register").send(userData);
@@ -216,7 +216,7 @@ describe("Post /auth/register", () => {
                 firstName: "John",
                 lastName: "Doe",
                 email: "johe@gmail.com",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             const userRepository = connection.getRepository(User);
@@ -232,7 +232,7 @@ describe("Post /auth/register", () => {
             const userData = {
                 firstName: "John",
                 lastName: "Doe",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             const response = await request(app)
@@ -246,7 +246,7 @@ describe("Post /auth/register", () => {
             const userData = {
                 lastName: "Doe",
                 email: "john@gmail.com",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             const response = await request(app)
@@ -274,6 +274,23 @@ describe("Post /auth/register", () => {
                 "Password should be at least 8 chars"
             );
         });
+
+        it("should return 400 if password does not meet strength requirements", async () => {
+            const userData = {
+                firstName: "John",
+                lastName: "Doe",
+                email: "john@gmail.com",
+                password: "password123",
+                role: "customer",
+            };
+            const response = await request(app)
+                .post("/auth/register")
+                .send(userData);
+            expect(response.statusCode).toBe(400);
+            expect(response.body.errors[0].message).toBe(
+                "Password must contain at least 1 uppercase, 1 lowercase, 1 number and 1 special character"
+            );
+        });
     });
 
     describe("Given fields requiring trimming", () => {
@@ -282,7 +299,7 @@ describe("Post /auth/register", () => {
                 firstName: "John",
                 lastName: "Doe",
                 email: "  john_trim@gmail.com  ",
-                password: "Password1234",
+                password: "Password1234!",
                 role: "customer",
             };
             const response = await request(app)
