@@ -7,6 +7,7 @@ import express, {
 import logger from "./config/logger";
 import type { HttpError } from "http-errors";
 import authRouter from "./routes/auth";
+import jwksRouter from "./routes/jwks";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import helmet from "helmet";
@@ -31,13 +32,44 @@ app.get("/", (req: Request, res: Response) => {
     res.status(200).send("Wellcome to auth service");
 });
 
-app.get("/health", (req: Request, res: Response) => {
-    res.status(200).json({
-        status: "ok",
-        database: AppDataSource.isInitialized ? "connected" : "disconnected",
-        timestamp: new Date().toISOString(),
-    });
+app.get("/health", async (req: Request, res: Response) => {
+    try {
+        // Import JwksService dynamically to avoid circular dependencies
+        const { JwksService } = await import("./services/JwksService");
+
+        // Check JWKS availability
+        let jwksStatus = "unavailable";
+        try {
+            await JwksService.getJwks();
+            jwksStatus = "available";
+        } catch (error) {
+            logger.error("JWKS health check failed", { error });
+            jwksStatus = "error";
+        }
+
+        res.status(200).json({
+            status: "ok",
+            environment: Config.NODE_ENV,
+            timestamp: new Date().toISOString(),
+            services: {
+                database: AppDataSource.isInitialized
+                    ? "connected"
+                    : "disconnected",
+                jwks: jwksStatus,
+            },
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            environment: Config.NODE_ENV,
+            timestamp: new Date().toISOString(),
+            error: "Health check failed : " + (error as Error).message,
+        });
+    }
 });
+
+// JWKS endpoint for public key discovery
+app.use(jwksRouter);
 
 app.use("/auth", authRouter);
 

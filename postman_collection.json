@@ -534,6 +534,128 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "JWKS & Security",
+            "item": [
+                {
+                    "name": "Get JWKS (Public Keys)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('JWKS endpoint returns 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response is valid JSON', function() {",
+                                    "    pm.response.to.be.json;",
+                                    "});",
+                                    "",
+                                    "pm.test('JWKS has keys array', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('keys');",
+                                    "    pm.expect(jsonData.keys).to.be.an('array');",
+                                    "    pm.expect(jsonData.keys.length).to.be.above(0);",
+                                    "});",
+                                    "",
+                                    "pm.test('Public key has required fields', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    var key = jsonData.keys[0];",
+                                    "    pm.expect(key).to.have.property('kty', 'RSA');",
+                                    "    pm.expect(key).to.have.property('use', 'sig');",
+                                    "    pm.expect(key).to.have.property('alg', 'RS256');",
+                                    "    pm.expect(key).to.have.property('kid');",
+                                    "    pm.expect(key).to.have.property('n');",
+                                    "    pm.expect(key).to.have.property('e');",
+                                    "});",
+                                    "",
+                                    "pm.test('Proper caching headers set', function() {",
+                                    "    pm.response.to.have.header('Cache-Control');",
+                                    "    pm.expect(pm.response.headers.get('Cache-Control')).to.include('public');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/.well-known/jwks.json",
+                            "host": ["{{base_url}}"],
+                            "path": [".well-known", "jwks.json"]
+                        },
+                        "description": "Get JSON Web Key Set (JWKS) containing public keys for JWT verification.\n\n**OpenID Connect Discovery Endpoint**\n\nFollows RFC 7517 (JSON Web Key) and RFC 8414 (OAuth 2.0 Authorization Server Metadata).\n\n**Use Cases:**\n- Verify JWT signatures in other services\n- Token validation in microservices\n- Third-party integrations\n\n**Response Format:**\n```json\n{\n  \"keys\": [{\n    \"kty\": \"RSA\",\n    \"use\": \"sig\",\n    \"kid\": \"auth-service-key-1\",\n    \"alg\": \"RS256\",\n    \"n\": \"...\",  // RSA modulus (public key)\n    \"e\": \"AQAB\"  // RSA exponent\n  }]\n}\n```\n\n**Features:**\n- Publicly accessible (no auth required)\n- Cached for 1 hour (performance optimization)\n- CORS enabled for cross-origin requests\n- Follows industry standards"
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/.well-known/jwks.json",
+                                    "host": ["{{base_url}}"],
+                                    "path": [".well-known", "jwks.json"]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json; charset=utf-8"
+                                },
+                                {
+                                    "key": "Cache-Control",
+                                    "value": "public, max-age=3600, immutable"
+                                }
+                            ],
+                            "cookie": [],
+                            "body": "{\n  \"keys\": [\n    {\n      \"kty\": \"RSA\",\n      \"n\": \"xGOr-H7A...\",\n      \"e\": \"AQAB\",\n      \"alg\": \"RS256\",\n      \"use\": \"sig\",\n      \"kid\": \"auth-service-key-1\"\n    }\n  ]\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Verify Token Works (Self Endpoint)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// This test verifies that JWT verification using JWKS works",
+                                    "pm.test('Token verified successfully via JWKS', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('User authenticated with JWKS-verified token', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('id');",
+                                    "    pm.expect(jsonData).to.have.property('email');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/auth/self",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "self"]
+                        },
+                        "description": "This request verifies that JWT token validation works using JWKS.\n\n**Behind the Scenes:**\n1. Client sends JWT token (in cookie)\n2. Authenticate middleware extracts token\n3. Middleware fetches public key from JWKS endpoint\n4. Token signature verified using public key\n5. If valid, request proceeds\n\n**Prerequisites:**\n- Must be logged in (run Login request first)\n- Access token in cookies\n\n**This tests the complete JWKS flow!**"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Endpoints related to JWKS (JSON Web Key Set) and security.\n\n**What is JWKS?**\n\nJWKS is an industry standard (RFC 7517) for publishing public keys used to verify JWT signatures.\n\n**Why is it important?**\n\n✅ **Security**: Public keys are served separately from tokens\n✅ **Scalability**: Multiple services can verify tokens\n✅ **Standards**: Follows OpenID Connect Discovery\n✅ **Flexibility**: Easy key rotation\n\n**Environment Behavior:**\n\n- **Development**: Serves local public key\n- **Production**: Serves production public key via HTTPS\n- **Testing**: Mock JWKS server for tests"
         }
     ],
     "variable": [
