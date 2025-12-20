@@ -7,11 +7,13 @@ import {
 import { AppDataSource } from "../config/data-source";
 import logger from "../config/logger";
 import { AuthController } from "../controllers/AuthController";
+import { UserController } from "../controllers/UserController";
 import { User } from "../entity/User";
 import { UserService } from "../services/Userservice";
 import { RefreshToken } from "../entity/RefreshToken";
 import { TokenService } from "../services/TokenService";
-import { registerValidator } from "../validators/register-validator";
+import { createManagerValidator } from "../validators/create-manager-validator";
+import { updateUserValidator } from "../validators/update-user-validator";
 import { validateRequest } from "../validators/validate-request";
 import { authenticate } from "../middleware/authenticate";
 import { authorize } from "../middleware/authorize";
@@ -26,15 +28,55 @@ const userService = new UserService(userRepository);
 const tokenService = new TokenService(refreshTokenRepository);
 
 const authController = new AuthController(userService, logger, tokenService);
+const userController = new UserController(userService, logger);
 
+// Get all users
+usersRouter.get(
+    "/",
+    authenticate,
+    authorize([roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.getAll(req, res, next)
+);
+
+// Get user by ID
+usersRouter.get(
+    "/:id",
+    authenticate,
+    authorize([roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.getById(req, res, next)
+);
+
+// Create manager
 usersRouter.post(
     "/create-manager",
     authenticate,
     authorize([roles.ADMIN]),
-    registerValidator,
+    createManagerValidator,
     validateRequest,
     (req: Request, res: Response, next: NextFunction) =>
         authController.createManager(req, res, next)
+);
+
+// Update user
+usersRouter.patch(
+    "/:id",
+    authenticate,
+    authorize([roles.ADMIN]),
+    updateUserValidator,
+    validateRequest,
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.update(req, res, next)
+);
+
+// Delete user
+usersRouter.delete(
+    "/:id",
+    authenticate,
+    authorize([roles.ADMIN]),
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.delete(req, res, next)
 );
 
 export default usersRouter;

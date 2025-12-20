@@ -12,6 +12,7 @@ import { DataSource } from "typeorm";
 import app from "../../src/app";
 import { AppDataSource } from "../../src/config/data-source";
 import { User } from "../../src/entity/User";
+import { Tenant } from "../../src/entity/Tenant";
 import mockJWKS from "mock-jwks";
 import { Config } from "../../src/config";
 import { roles } from "../../src/constants";
@@ -50,11 +51,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
     describe("Given valid manager data", () => {
         it("should return 201 status code when super admin creates manager", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -74,11 +82,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should return valid json response", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -100,11 +115,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should persist manager in database with manager role", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -120,19 +142,27 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
             // Assert
             const userRepository = connection.getRepository(User);
-            const users = await userRepository.find();
+            const users = await userRepository.find({ relations: ["tenant"] });
             expect(users).toHaveLength(1);
             expect(users[0].role).toBe(roles.MANAGER);
             expect(users[0].email).toBe(managerData.email);
+            expect(users[0].tenant.id).toBe(tenant.id);
         });
 
         it("should return created manager id", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -153,11 +183,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should store hashed password not plain text", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -180,11 +217,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should trim email before saving", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "  john.manager@example.com  ",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -208,10 +252,17 @@ describe("POST /users/create-manager - Create Manager User", () => {
     describe("Given invalid manager data", () => {
         it("should return 400 if firstName is missing", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -231,10 +282,17 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should return 400 if lastName is missing", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -254,10 +312,17 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should return 400 if email is missing", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -277,10 +342,17 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should return 400 if password is missing", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -300,11 +372,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should return 400 if email is invalid format", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "invalid-email",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -324,11 +403,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should return 400 if password is weak", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "weak",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -348,11 +434,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should return 400 if email already exists", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({
@@ -380,11 +473,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
     describe("Given authentication/authorization", () => {
         it("should return 401 if user is not authenticated", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             // Act
@@ -398,11 +498,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should return 403 if user is not a super admin", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             // Create a manager token (not admin)
@@ -423,11 +530,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should return 403 if user is a customer", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             // Create a customer token
@@ -448,11 +562,18 @@ describe("POST /users/create-manager - Create Manager User", () => {
 
         it("should allow super admin to create manager", async () => {
             // Arrange
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: "Test Tenant",
+                address: "Test Address",
+            });
+
             const managerData = {
                 firstName: "John",
                 lastName: "Manager",
                 email: "john.manager@example.com",
                 password: "Password123!",
+                tenantId: tenant.id,
             };
 
             const adminToken = jwks.token({

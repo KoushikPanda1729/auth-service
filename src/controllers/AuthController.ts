@@ -183,7 +183,7 @@ export class AuthController {
     }
 
     async createManager(req: Request, res: Response, next: NextFunction) {
-        const { firstName, lastName, email, password, role } =
+        const { firstName, lastName, email, password, role, tenantId } =
             req.body as RegisterBody;
 
         try {
@@ -193,10 +193,11 @@ export class AuthController {
                 email,
                 password,
                 role: role || roles.MANAGER,
+                ...(tenantId && { tenantId }),
             });
 
             this.logger.info(
-                `Manager created successfully, id: ${user.id}, role: ${user.role}`
+                `Manager created successfully, id: ${user.id}, role: ${user.role}, tenantId: ${tenantId}`
             );
 
             res.status(201).json({ id: user.id });
