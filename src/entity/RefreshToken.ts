@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import type { User } from "./User";
 
-@Entity()
+@Entity({ name: "refreshTokens" })
 export class RefreshToken {
     @PrimaryGeneratedColumn()
     id!: number;

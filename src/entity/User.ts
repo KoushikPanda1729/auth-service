@@ -5,10 +5,12 @@ import {
     OneToMany,
     UpdateDateColumn,
     CreateDateColumn,
+    ManyToOne,
 } from "typeorm";
 import { RefreshToken } from "./RefreshToken";
+import { Tenant } from "./Tenant";
 
-@Entity()
+@Entity({ name: "users" })
 export class User {
     @PrimaryGeneratedColumn()
     id!: number;
@@ -30,6 +32,9 @@ export class User {
 
     @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
     refreshTokens!: RefreshToken[];
+
+    @ManyToOne(() => Tenant)
+    tenant!: Tenant;
 
     @UpdateDateColumn()
     updatedAt!: Date;
