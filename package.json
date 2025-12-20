@@ -12,7 +12,10 @@
         "lint:fix": "npx eslint . --fix \"src/**/*.ts\"",
         "lint:check": "npx eslint . \"src/**/*.ts\"",
         "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --watch --runInBand",
-        "prepare": "husky"
+        "prepare": "husky",
+        "migration:generate": "cross-env NODE_ENV=dev tsx ./node_modules/typeorm/cli.js migration:generate -d ./src/config/data-source.ts",
+        "migration:run": "cross-env NODE_ENV=dev tsx ./node_modules/typeorm/cli.js migration:run -d ./src/config/data-source.ts",
+        "migration:new": "cross-env NODE_ENV=dev tsx ./node_modules/typeorm/cli.js migration:create -d ./src/config/data-source.ts"
     },
     "keywords": [
         "Auth",
