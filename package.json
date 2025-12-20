@@ -12,6 +12,8 @@
         "lint:fix": "npx eslint . --fix \"src/**/*.ts\"",
         "lint:check": "npx eslint . \"src/**/*.ts\"",
         "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --watch --runInBand",
+        "test:coverage": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --coverage --runInBand",
+        "test:ci": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --ci --coverage --runInBand",
         "prepare": "husky",
         "migration:generate": "cross-env NODE_ENV=dev tsx ./node_modules/typeorm/cli.js migration:generate -d ./src/config/data-source.ts",
         "migration:run": "cross-env NODE_ENV=dev tsx ./node_modules/typeorm/cli.js migration:run -d ./src/config/data-source.ts",
