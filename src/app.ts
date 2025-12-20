@@ -9,6 +9,7 @@ import type { HttpError } from "http-errors";
 import authRouter from "./routes/auth";
 import jwksRouter from "./routes/jwks";
 import tenantRouter from "./routes/tenant";
+import usersRouter from "./routes/users";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import helmet from "helmet";
@@ -74,6 +75,7 @@ app.use(jwksRouter);
 
 app.use("/auth", authRouter);
 app.use("/tenants", tenantRouter);
+app.use("/users", usersRouter);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {

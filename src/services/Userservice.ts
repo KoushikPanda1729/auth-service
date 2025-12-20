@@ -12,7 +12,7 @@ export class UserService {
         this.userRepository = userRepository;
     }
 
-    async create({ firstName, lastName, email, password }: RegisterBody) {
+    async create({ firstName, lastName, email, password, role }: RegisterBody) {
         const userRepository = AppDataSource.getRepository(User);
         const user = await userRepository.findOne({
             where: { email },
@@ -31,7 +31,7 @@ export class UserService {
                 lastName,
                 email,
                 password: hashedPassword,
-                role: roles.CUSTOMER,
+                role: role || roles.CUSTOMER,
             });
             return user;
         } catch {

@@ -4,6 +4,7 @@ import type { UserService } from "../services/Userservice";
 import type { TokenService } from "../services/TokenService";
 import type { Logger } from "winston";
 import createHttpError from "http-errors";
+import { roles } from "../constants";
 
 export class AuthController {
     private userService: UserService;
@@ -176,6 +177,29 @@ export class AuthController {
             }
 
             res.status(200).json(user);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async createManager(req: Request, res: Response, next: NextFunction) {
+        const { firstName, lastName, email, password, role } =
+            req.body as RegisterBody;
+
+        try {
+            const user = await this.userService.create({
+                firstName,
+                lastName,
+                email,
+                password,
+                role: role || roles.MANAGER,
+            });
+
+            this.logger.info(
+                `Manager created successfully, id: ${user.id}, role: ${user.role}`
+            );
+
+            res.status(201).json({ id: user.id });
         } catch (error) {
             next(error);
         }
