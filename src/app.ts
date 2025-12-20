@@ -8,6 +8,7 @@ import logger from "./config/logger";
 import type { HttpError } from "http-errors";
 import authRouter from "./routes/auth";
 import jwksRouter from "./routes/jwks";
+import tenantRouter from "./routes/tenant";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import helmet from "helmet";
@@ -72,6 +73,7 @@ app.get("/health", async (req: Request, res: Response) => {
 app.use(jwksRouter);
 
 app.use("/auth", authRouter);
+app.use("/tenants", tenantRouter);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
