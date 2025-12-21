@@ -6,7 +6,8 @@
     "type": "module",
     "scripts": {
         "dev": "cross-env NODE_ENV=dev nodemon --exec tsx src/server.ts",
-        "build": "tsc",
+        "build": "esbuild src/server.ts --bundle --platform=node --format=esm --outfile=dist/server.js --external:pg-native --external:express --external:typeorm --external:reflect-metadata --external:bcrypt --external:cookie-parser --external:cors --external:helmet --external:express-jwt --external:express-rate-limit --external:express-validator --external:http-errors --external:jose --external:jsonwebtoken --external:jwks-rsa --external:pg --external:winston --external:dotenv",
+        "start": "NODE_ENV=prod node dist/server.js",
         "format:fix": "npx prettier . --write \"src/**/*.ts\"",
         "format:check": "npx prettier . --check \"src/**/*.ts\"",
         "lint:fix": "npx eslint . --fix \"src/**/*.ts\"",
@@ -39,6 +40,7 @@
         "@types/node": "^24.10.1",
         "@types/supertest": "^6.0.3",
         "@types/winston": "^2.4.4",
+        "esbuild": "^0.27.2",
         "eslint": "^9.39.1",
         "husky": "^9.1.7",
         "jest": "^30.2.0",

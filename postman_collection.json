@@ -1,28 +1,14 @@
 {
     "info": {
         "_postman_id": "auth-service-collection",
-        "name": "Auth Service API",
-        "description": "Complete authentication service API with JWT token management, user registration, login, logout, and token refresh functionality.",
+        "name": "Auth Service API - Complete",
+        "description": "Complete authentication service API with JWT token management, user management, tenant management, and JWKS endpoints.",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
         {
             "name": "Health & Info",
             "item": [
-                {
-                    "name": "Health Check",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{base_url}}/health",
-                            "host": ["{{base_url}}"],
-                            "path": ["health"]
-                        },
-                        "description": "Check service health and database connection status"
-                    },
-                    "response": []
-                },
                 {
                     "name": "Root Endpoint",
                     "request": {
@@ -49,7 +35,6 @@
                             "listen": "test",
                             "script": {
                                 "exec": [
-                                    "// Save cookies automatically",
                                     "if (pm.response.code === 201) {",
                                     "    pm.test('Registration successful', function() {",
                                     "        pm.response.to.have.status(201);",
@@ -81,7 +66,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"SecurePass123!\"\n}"
+                            "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"{{test_email}}\",\n    \"password\": \"{{test_password}}\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/auth/register",
@@ -90,94 +75,7 @@
                         },
                         "description": "Register a new user account.\n\n**Requirements:**\n- Email must be unique and valid format\n- Password minimum 8 characters with uppercase, lowercase, number, and special character\n- All fields are required\n\n**Response:**\n- Sets httpOnly cookies: accessToken (1h) and refreshToken (1y)\n- Returns user ID"
                     },
-                    "response": [
-                        {
-                            "name": "Success",
-                            "originalRequest": {
-                                "method": "POST",
-                                "header": [],
-                                "body": {
-                                    "mode": "raw",
-                                    "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"SecurePass123!\"\n}",
-                                    "options": {
-                                        "raw": {
-                                            "language": "json"
-                                        }
-                                    }
-                                },
-                                "url": {
-                                    "raw": "{{base_url}}/auth/register",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "register"]
-                                }
-                            },
-                            "status": "Created",
-                            "code": 201,
-                            "_postman_previewlanguage": "json",
-                            "header": [
-                                {
-                                    "key": "Content-Type",
-                                    "value": "application/json"
-                                }
-                            ],
-                            "cookie": [],
-                            "body": "{\n    \"id\": 1\n}"
-                        },
-                        {
-                            "name": "Email Already Exists",
-                            "originalRequest": {
-                                "method": "POST",
-                                "header": [],
-                                "body": {
-                                    "mode": "raw",
-                                    "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"existing@example.com\",\n    \"password\": \"SecurePass123!\"\n}",
-                                    "options": {
-                                        "raw": {
-                                            "language": "json"
-                                        }
-                                    }
-                                },
-                                "url": {
-                                    "raw": "{{base_url}}/auth/register",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "register"]
-                                }
-                            },
-                            "status": "Bad Request",
-                            "code": 400,
-                            "_postman_previewlanguage": "json",
-                            "header": [],
-                            "cookie": [],
-                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"BadRequestError\",\n            \"message\": \"Email already exists!\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
-                        },
-                        {
-                            "name": "Weak Password",
-                            "originalRequest": {
-                                "method": "POST",
-                                "header": [],
-                                "body": {
-                                    "mode": "raw",
-                                    "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"weak\"\n}",
-                                    "options": {
-                                        "raw": {
-                                            "language": "json"
-                                        }
-                                    }
-                                },
-                                "url": {
-                                    "raw": "{{base_url}}/auth/register",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "register"]
-                                }
-                            },
-                            "status": "Bad Request",
-                            "code": 400,
-                            "_postman_previewlanguage": "json",
-                            "header": [],
-                            "cookie": [],
-                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"ValidationError\",\n            \"message\": \"Password must contain at least 1 uppercase, 1 lowercase, 1 number and 1 special character\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
-                        }
-                    ]
+                    "response": []
                 },
                 {
                     "name": "Login",
@@ -186,7 +84,6 @@
                             "listen": "test",
                             "script": {
                                 "exec": [
-                                    "// Save cookies automatically",
                                     "if (pm.response.code === 200) {",
                                     "    pm.test('Login successful', function() {",
                                     "        pm.response.to.have.status(200);",
@@ -218,121 +115,33 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"SecurePass123!\"\n}"
+                            "raw": "{\n    \"email\": \"{{test_email}}\",\n    \"password\": \"{{test_password}}\"\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/auth/login",
                             "host": ["{{base_url}}"],
                             "path": ["auth", "login"]
                         },
-                        "description": "Login with email and password.\n\n**Rate Limiting:**\n- Maximum 5 failed attempts per 15 minutes per IP\n- Returns 429 when limit exceeded\n\n**Response:**\n- Sets httpOnly cookies: accessToken (1h) and refreshToken (1y)\n- Returns user ID\n- Stores new refresh token in database"
+                        "description": "Login with email and password.\n\n**Rate Limiting:**\n- Maximum 5 failed attempts per 15 minutes per IP\n\n**Response:**\n- Sets httpOnly cookies: accessToken (1h) and refreshToken (1y)\n- Returns user ID"
                     },
-                    "response": [
-                        {
-                            "name": "Success",
-                            "originalRequest": {
-                                "method": "POST",
-                                "header": [],
-                                "body": {
-                                    "mode": "raw",
-                                    "raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"SecurePass123!\"\n}",
-                                    "options": {
-                                        "raw": {
-                                            "language": "json"
-                                        }
-                                    }
-                                },
-                                "url": {
-                                    "raw": "{{base_url}}/auth/login",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "login"]
-                                }
-                            },
-                            "status": "OK",
-                            "code": 200,
-                            "_postman_previewlanguage": "json",
-                            "header": [],
-                            "cookie": [],
-                            "body": "{\n    \"id\": 1\n}"
+                    "response": []
+                },
+                {
+                    "name": "Get Current User",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/auth/self",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "self"]
                         },
-                        {
-                            "name": "Invalid Credentials",
-                            "originalRequest": {
-                                "method": "POST",
-                                "header": [],
-                                "body": {
-                                    "mode": "raw",
-                                    "raw": "{\n    \"email\": \"wrong@example.com\",\n    \"password\": \"WrongPass123!\"\n}",
-                                    "options": {
-                                        "raw": {
-                                            "language": "json"
-                                        }
-                                    }
-                                },
-                                "url": {
-                                    "raw": "{{base_url}}/auth/login",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "login"]
-                                }
-                            },
-                            "status": "Bad Request",
-                            "code": 400,
-                            "_postman_previewlanguage": "json",
-                            "header": [],
-                            "cookie": [],
-                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"BadRequestError\",\n            \"message\": \"Invalid credentials\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
-                        },
-                        {
-                            "name": "Rate Limited",
-                            "originalRequest": {
-                                "method": "POST",
-                                "header": [],
-                                "body": {
-                                    "mode": "raw",
-                                    "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"WrongPass123!\"\n}",
-                                    "options": {
-                                        "raw": {
-                                            "language": "json"
-                                        }
-                                    }
-                                },
-                                "url": {
-                                    "raw": "{{base_url}}/auth/login",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "login"]
-                                }
-                            },
-                            "status": "Too Many Requests",
-                            "code": 429,
-                            "_postman_previewlanguage": "json",
-                            "header": [],
-                            "cookie": [],
-                            "body": "{\n    \"message\": \"Too many authentication attempts, please try again later\"\n}"
-                        }
-                    ]
+                        "description": "Get current authenticated user information.\n\n**Requires:** Valid access token in cookies\n\n**Returns:** User profile without password"
+                    },
+                    "response": []
                 },
                 {
                     "name": "Refresh Token",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "if (pm.response.code === 200) {",
-                                    "    pm.test('Token refreshed successfully', function() {",
-                                    "        pm.response.to.have.status(200);",
-                                    "    });",
-                                    "    ",
-                                    "    pm.test('New cookies are set', function() {",
-                                    "        pm.expect(pm.cookies.has('accessToken')).to.be.true;",
-                                    "        pm.expect(pm.cookies.has('refreshToken')).to.be.true;",
-                                    "    });",
-                                    "}"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
                     "request": {
                         "method": "POST",
                         "header": [],
@@ -341,69 +150,12 @@
                             "host": ["{{base_url}}"],
                             "path": ["auth", "refresh"]
                         },
-                        "description": "Refresh access token using refresh token from cookies.\n\n**Token Rotation:**\n- Old refresh token is deleted from database\n- New refresh token is issued and stored\n- New access token is issued\n- Both tokens are set as httpOnly cookies\n\n**Security:**\n- Validates refresh token against database\n- Prevents token reuse (old token invalidated)\n- Checks token expiration"
+                        "description": "Refresh access token using refresh token from cookies.\n\n**Token Rotation:**\n- Old refresh token deleted\n- New tokens issued\n- Both set as httpOnly cookies"
                     },
-                    "response": [
-                        {
-                            "name": "Success",
-                            "originalRequest": {
-                                "method": "POST",
-                                "header": [],
-                                "url": {
-                                    "raw": "{{base_url}}/auth/refresh",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "refresh"]
-                                }
-                            },
-                            "status": "OK",
-                            "code": 200,
-                            "_postman_previewlanguage": "json",
-                            "header": [],
-                            "cookie": [],
-                            "body": "{\n    \"id\": 1\n}"
-                        },
-                        {
-                            "name": "Missing Refresh Token",
-                            "originalRequest": {
-                                "method": "POST",
-                                "header": [],
-                                "url": {
-                                    "raw": "{{base_url}}/auth/refresh",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "refresh"]
-                                }
-                            },
-                            "status": "Unauthorized",
-                            "code": 401,
-                            "_postman_previewlanguage": "json",
-                            "header": [],
-                            "cookie": [],
-                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"UnauthorizedError\",\n            \"message\": \"Refresh token required\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
-                        }
-                    ]
+                    "response": []
                 },
                 {
                     "name": "Logout",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "if (pm.response.code === 200) {",
-                                    "    pm.test('Logout successful', function() {",
-                                    "        pm.response.to.have.status(200);",
-                                    "    });",
-                                    "    ",
-                                    "    pm.test('Success message returned', function() {",
-                                    "        var jsonData = pm.response.json();",
-                                    "        pm.expect(jsonData.message).to.eql('Logged out successfully');",
-                                    "    });",
-                                    "}"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
                     "request": {
                         "method": "POST",
                         "header": [],
@@ -412,70 +164,85 @@
                             "host": ["{{base_url}}"],
                             "path": ["auth", "logout"]
                         },
-                        "description": "Logout and revoke refresh token.\n\n**Actions:**\n- Deletes refresh token from database\n- Clears accessToken and refreshToken cookies\n- Prevents token refresh (refresh token is revoked)\n\n**Note:**\n- Access tokens remain valid until expiry (JWT limitation)\n- To fully invalidate, implement a token blacklist"
+                        "description": "Logout and revoke refresh token.\n\n**Actions:**\n- Deletes refresh token from database\n- Clears cookies"
                     },
-                    "response": [
-                        {
-                            "name": "Success",
-                            "originalRequest": {
-                                "method": "POST",
-                                "header": [],
-                                "url": {
-                                    "raw": "{{base_url}}/auth/logout",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "logout"]
-                                }
-                            },
-                            "status": "OK",
-                            "code": 200,
-                            "_postman_previewlanguage": "json",
-                            "header": [],
-                            "cookie": [],
-                            "body": "{\n    \"message\": \"Logged out successfully\"\n}"
-                        },
-                        {
-                            "name": "Unauthorized",
-                            "originalRequest": {
-                                "method": "POST",
-                                "header": [],
-                                "url": {
-                                    "raw": "{{base_url}}/auth/logout",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "logout"]
-                                }
-                            },
-                            "status": "Unauthorized",
-                            "code": 401,
-                            "_postman_previewlanguage": "json",
-                            "header": [],
-                            "cookie": [],
-                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"UnauthorizedError\",\n            \"message\": \"Authentication required\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
-                        }
-                    ]
-                },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "User Management",
+            "item": [
                 {
-                    "name": "Get Current User",
+                    "name": "Get All Users",
                     "event": [
                         {
                             "listen": "test",
                             "script": {
                                 "exec": [
                                     "if (pm.response.code === 200) {",
-                                    "    pm.test('User info retrieved', function() {",
+                                    "    pm.test('Users list retrieved', function() {",
                                     "        pm.response.to.have.status(200);",
                                     "    });",
                                     "    ",
-                                    "    pm.test('Response has user data', function() {",
+                                    "    pm.test('Response is an array', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.be.an('array');",
+                                    "    });",
+                                    "    ",
+                                    "    if (pm.response.json().length > 0) {",
+                                    "        pm.test('User has required fields', function() {",
+                                    "            var user = pm.response.json()[0];",
+                                    "            pm.expect(user).to.have.property('id');",
+                                    "            pm.expect(user).to.have.property('email');",
+                                    "            pm.expect(user).to.not.have.property('password');",
+                                    "        });",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/users?page={{page}}&limit={{limit}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["users"],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "{{page}}"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "{{limit}}"
+                                }
+                            ]
+                        },
+                        "description": "Get all users with pagination.\n\n**Requires:** Admin role\n\n**Query Parameters:**\n- page: Page number (default: 1)\n- limit: Items per page (default: 10)\n\n**Response:** Array of users with tenant info"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get User by ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('User retrieved successfully', function() {",
+                                    "        pm.response.to.have.status(200);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('User has required fields', function() {",
                                     "        var jsonData = pm.response.json();",
                                     "        pm.expect(jsonData).to.have.property('id');",
                                     "        pm.expect(jsonData).to.have.property('email');",
-                                    "        pm.expect(jsonData).to.have.property('firstName');",
-                                    "        pm.expect(jsonData).to.have.property('lastName');",
                                     "        pm.expect(jsonData).to.have.property('role');",
-                                    "    });",
-                                    "    ",
-                                    "    pm.test('Password is not exposed', function() {",
-                                    "        var jsonData = pm.response.json();",
                                     "        pm.expect(jsonData).to.not.have.property('password');",
                                     "    });",
                                     "}"
@@ -488,52 +255,353 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{base_url}}/auth/self",
+                            "raw": "{{base_url}}/users/{{user_id}}",
                             "host": ["{{base_url}}"],
-                            "path": ["auth", "self"]
+                            "path": ["users", "{{user_id}}"]
                         },
-                        "description": "Get current authenticated user information.\n\n**Requires:**\n- Valid access token in cookies\n\n**Returns:**\n- User ID\n- First name\n- Last name\n- Email\n- Role\n\n**Security:**\n- Password is NOT included in response\n- Requires valid JWT access token"
+                        "description": "Get a specific user by ID.\n\n**Requires:** Admin role\n\n**Returns:** User details with tenant information"
                     },
-                    "response": [
+                    "response": []
+                },
+                {
+                    "name": "Create Manager",
+                    "event": [
                         {
-                            "name": "Success",
-                            "originalRequest": {
-                                "method": "GET",
-                                "header": [],
-                                "url": {
-                                    "raw": "{{base_url}}/auth/self",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "self"]
-                                }
-                            },
-                            "status": "OK",
-                            "code": 200,
-                            "_postman_previewlanguage": "json",
-                            "header": [],
-                            "cookie": [],
-                            "body": "{\n    \"id\": 1,\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"role\": \"customer\"\n}"
-                        },
-                        {
-                            "name": "Unauthorized",
-                            "originalRequest": {
-                                "method": "GET",
-                                "header": [],
-                                "url": {
-                                    "raw": "{{base_url}}/auth/self",
-                                    "host": ["{{base_url}}"],
-                                    "path": ["auth", "self"]
-                                }
-                            },
-                            "status": "Unauthorized",
-                            "code": 401,
-                            "_postman_previewlanguage": "json",
-                            "header": [],
-                            "cookie": [],
-                            "body": "{\n    \"errors\": [\n        {\n            \"type\": \"UnauthorizedError\",\n            \"message\": \"Authentication required\",\n            \"path\": \"\",\n            \"location\": \"\"\n        }\n    ]\n}"
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    pm.test('Manager created successfully', function() {",
+                                    "        pm.response.to.have.status(201);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Response has manager id', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('id');",
+                                    "        pm.environment.set('manager_id', jsonData.id);",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
                         }
-                    ]
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"firstName\": \"Manager\",\n    \"lastName\": \"Smith\",\n    \"email\": \"{{manager_email}}\",\n    \"password\": \"{{manager_password}}\",\n    \"tenantId\": {{tenant_id}}\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/users",
+                            "host": ["{{base_url}}"],
+                            "path": ["users"]
+                        },
+                        "description": "Create a new manager user.\n\n**Requires:** Admin role\n\n**Required Fields:**\n- firstName\n- lastName\n- email (must be unique)\n- password (strong password)\n- tenantId (must exist)\n\n**Response:** Returns created manager ID"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('User updated successfully', function() {",
+                                    "        pm.response.to.have.status(200);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Response has user id', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('id');",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"firstName\": \"Updated\",\n    \"lastName\": \"Name\",\n    \"role\": \"manager\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/users/{{user_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["users", "{{user_id}}"]
+                        },
+                        "description": "Update user information.\n\n**Requires:** Admin role\n\n**Updatable Fields:**\n- firstName\n- lastName\n- role (customer, manager, admin)\n\n**Note:** Email and password cannot be updated via this endpoint"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('User deleted successfully', function() {",
+                                    "        pm.response.to.have.status(200);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Response has user id', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('id');",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/users/{{user_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["users", "{{user_id}}"]
+                        },
+                        "description": "Delete a user.\n\n**Requires:** Admin role\n\n**Response:** Returns deleted user ID"
+                    },
+                    "response": []
                 }
-            ]
+            ],
+            "description": "User management endpoints for admins.\n\n**All endpoints require Admin role**"
+        },
+        {
+            "name": "Tenant Management",
+            "item": [
+                {
+                    "name": "Get All Tenants",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Tenants list retrieved', function() {",
+                                    "        pm.response.to.have.status(200);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Response is an array', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.be.an('array');",
+                                    "    });",
+                                    "    ",
+                                    "    if (pm.response.json().length > 0) {",
+                                    "        pm.test('Tenant has required fields', function() {",
+                                    "            var tenant = pm.response.json()[0];",
+                                    "            pm.expect(tenant).to.have.property('id');",
+                                    "            pm.expect(tenant).to.have.property('name');",
+                                    "            pm.expect(tenant).to.have.property('address');",
+                                    "        });",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/tenants?page={{page}}&limit={{limit}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["tenants"],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "{{page}}"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "{{limit}}"
+                                }
+                            ]
+                        },
+                        "description": "Get all tenants with pagination.\n\n**Requires:** Admin role\n\n**Query Parameters:**\n- page: Page number (default: 1)\n- limit: Items per page (default: 10)\n\n**Response:** Array of tenants"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Tenant by ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Tenant retrieved successfully', function() {",
+                                    "        pm.response.to.have.status(200);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Tenant has required fields', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('id');",
+                                    "        pm.expect(jsonData).to.have.property('name');",
+                                    "        pm.expect(jsonData).to.have.property('address');",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/tenants/{{tenant_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["tenants", "{{tenant_id}}"]
+                        },
+                        "description": "Get a specific tenant by ID.\n\n**Requires:** Admin role\n\n**Returns:** Tenant details"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Tenant",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    pm.test('Tenant created successfully', function() {",
+                                    "        pm.response.to.have.status(201);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Response has tenant id', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('id');",
+                                    "        pm.environment.set('tenant_id', jsonData.id);",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"{{tenant_name}}\",\n    \"address\": \"{{tenant_address}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/tenants",
+                            "host": ["{{base_url}}"],
+                            "path": ["tenants"]
+                        },
+                        "description": "Create a new tenant.\n\n**Requires:** Admin role\n\n**Required Fields:**\n- name (2-100 characters)\n- address\n\n**Response:** Returns created tenant ID"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Tenant",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Tenant updated successfully', function() {",
+                                    "        pm.response.to.have.status(200);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Response has tenant id', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('id');",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Updated Tenant Name\",\n    \"address\": \"123 New Street, City, Country\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/tenants/{{tenant_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["tenants", "{{tenant_id}}"]
+                        },
+                        "description": "Update tenant information.\n\n**Requires:** Admin role\n\n**Updatable Fields:**\n- name\n- address\n\n**Response:** Returns updated tenant ID"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Tenant",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    pm.test('Tenant deleted successfully', function() {",
+                                    "        pm.response.to.have.status(200);",
+                                    "    });",
+                                    "    ",
+                                    "    pm.test('Response has tenant id', function() {",
+                                    "        var jsonData = pm.response.json();",
+                                    "        pm.expect(jsonData).to.have.property('id');",
+                                    "    });",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/tenants/{{tenant_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["tenants", "{{tenant_id}}"]
+                        },
+                        "description": "Delete a tenant.\n\n**Requires:** Admin role\n\n**Note:** This will also affect all users associated with this tenant\n\n**Response:** Returns deleted tenant ID"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Tenant management endpoints for admins.\n\n**All endpoints require Admin role**"
         },
         {
             "name": "JWKS & Security",
@@ -569,11 +637,6 @@
                                     "    pm.expect(key).to.have.property('kid');",
                                     "    pm.expect(key).to.have.property('n');",
                                     "    pm.expect(key).to.have.property('e');",
-                                    "});",
-                                    "",
-                                    "pm.test('Proper caching headers set', function() {",
-                                    "    pm.response.to.have.header('Cache-Control');",
-                                    "    pm.expect(pm.response.headers.get('Cache-Control')).to.include('public');",
                                     "});"
                                 ],
                                 "type": "text/javascript"
@@ -588,74 +651,12 @@
                             "host": ["{{base_url}}"],
                             "path": [".well-known", "jwks.json"]
                         },
-                        "description": "Get JSON Web Key Set (JWKS) containing public keys for JWT verification.\n\n**OpenID Connect Discovery Endpoint**\n\nFollows RFC 7517 (JSON Web Key) and RFC 8414 (OAuth 2.0 Authorization Server Metadata).\n\n**Use Cases:**\n- Verify JWT signatures in other services\n- Token validation in microservices\n- Third-party integrations\n\n**Response Format:**\n```json\n{\n  \"keys\": [{\n    \"kty\": \"RSA\",\n    \"use\": \"sig\",\n    \"kid\": \"auth-service-key-1\",\n    \"alg\": \"RS256\",\n    \"n\": \"...\",  // RSA modulus (public key)\n    \"e\": \"AQAB\"  // RSA exponent\n  }]\n}\n```\n\n**Features:**\n- Publicly accessible (no auth required)\n- Cached for 1 hour (performance optimization)\n- CORS enabled for cross-origin requests\n- Follows industry standards"
-                    },
-                    "response": [
-                        {
-                            "name": "Success",
-                            "originalRequest": {
-                                "method": "GET",
-                                "header": [],
-                                "url": {
-                                    "raw": "{{base_url}}/.well-known/jwks.json",
-                                    "host": ["{{base_url}}"],
-                                    "path": [".well-known", "jwks.json"]
-                                }
-                            },
-                            "status": "OK",
-                            "code": 200,
-                            "_postman_previewlanguage": "json",
-                            "header": [
-                                {
-                                    "key": "Content-Type",
-                                    "value": "application/json; charset=utf-8"
-                                },
-                                {
-                                    "key": "Cache-Control",
-                                    "value": "public, max-age=3600, immutable"
-                                }
-                            ],
-                            "cookie": [],
-                            "body": "{\n  \"keys\": [\n    {\n      \"kty\": \"RSA\",\n      \"n\": \"xGOr-H7A...\",\n      \"e\": \"AQAB\",\n      \"alg\": \"RS256\",\n      \"use\": \"sig\",\n      \"kid\": \"auth-service-key-1\"\n    }\n  ]\n}"
-                        }
-                    ]
-                },
-                {
-                    "name": "Verify Token Works (Self Endpoint)",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "// This test verifies that JWT verification using JWKS works",
-                                    "pm.test('Token verified successfully via JWKS', function() {",
-                                    "    pm.response.to.have.status(200);",
-                                    "});",
-                                    "",
-                                    "pm.test('User authenticated with JWKS-verified token', function() {",
-                                    "    var jsonData = pm.response.json();",
-                                    "    pm.expect(jsonData).to.have.property('id');",
-                                    "    pm.expect(jsonData).to.have.property('email');",
-                                    "});"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{base_url}}/auth/self",
-                            "host": ["{{base_url}}"],
-                            "path": ["auth", "self"]
-                        },
-                        "description": "This request verifies that JWT token validation works using JWKS.\n\n**Behind the Scenes:**\n1. Client sends JWT token (in cookie)\n2. Authenticate middleware extracts token\n3. Middleware fetches public key from JWKS endpoint\n4. Token signature verified using public key\n5. If valid, request proceeds\n\n**Prerequisites:**\n- Must be logged in (run Login request first)\n- Access token in cookies\n\n**This tests the complete JWKS flow!**"
+                        "description": "Get JSON Web Key Set (JWKS) for JWT verification.\n\n**Public Endpoint** - No authentication required\n\n**Use Cases:**\n- Verify JWT signatures in other services\n- Third-party integrations\n\n**Response:** Contains RSA public keys"
                     },
                     "response": []
                 }
             ],
-            "description": "Endpoints related to JWKS (JSON Web Key Set) and security.\n\n**What is JWKS?**\n\nJWKS is an industry standard (RFC 7517) for publishing public keys used to verify JWT signatures.\n\n**Why is it important?**\n\n✅ **Security**: Public keys are served separately from tokens\n✅ **Scalability**: Multiple services can verify tokens\n✅ **Standards**: Follows OpenID Connect Discovery\n✅ **Flexibility**: Easy key rotation\n\n**Environment Behavior:**\n\n- **Development**: Serves local public key\n- **Production**: Serves production public key via HTTPS\n- **Testing**: Mock JWKS server for tests"
+            "description": "JWKS endpoints for token verification"
         }
     ],
     "variable": [
