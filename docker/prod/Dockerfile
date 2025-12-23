@@ -38,7 +38,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev --ignore-scripts && \
     npm cache clean --force
 
-# Copy built application from builder stage
+# Copy built application from builder stage (includes migrations, config, and entities)
 COPY --from=builder /app/dist ./dist
 
 # Copy other necessary files
