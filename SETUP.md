@@ -56,6 +56,11 @@ docker run --rm --name auth-service-pgcontainer \
   -d postgres
 ```
 
+```bash
+# Run Container
+docker run --rm --name auth-service-pgcontainer -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -v auth-service-pgdata:/var/lib/postgresql  -p 5432:5432 -d postgres
+```
+
 ### Database Migrations
 
 ```bash
