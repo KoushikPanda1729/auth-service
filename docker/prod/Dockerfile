@@ -41,9 +41,6 @@ RUN npm ci --omit=dev --ignore-scripts && \
 # Copy built application from builder stage (includes migrations, config, and entities)
 COPY --from=builder /app/dist ./dist
 
-# Copy other necessary files
-COPY --chown=nodejs:nodejs .env.prod ./.env
-
 # Change ownership to nodejs user
 RUN chown -R nodejs:nodejs /app
 
