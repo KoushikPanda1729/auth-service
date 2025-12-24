@@ -15,6 +15,21 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
       - uses: actions/checkout@v3
 
@@ -28,14 +43,14 @@ jobs:
       - name: Create .env.test file
         run: |
           echo "NODE_ENV=test" > .env.test
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env.test
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env.test
-          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env.test
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env.test
-          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env.test
-          echo "REFRESH_TOKEN_SECRET=${{ secrets.REFRESH_TOKEN_SECRET }}" >> .env.test
-          echo "JWKS_URI=${{ secrets.JWKS_URI }}" >> .env.test
-          echo "PRIVATE_KEY=${{ secrets.PRIVATE_KEY }}" >> .env.test
+          echo "DB_HOST=localhost" >> .env.test
+          echo "DB_PORT=5432" >> .env.test
+          echo "DB_USERNAME=test_user" >> .env.test
+          echo "DB_PASSWORD=test_password" >> .env.test
+          echo "DB_NAME=test_db" >> .env.test
+          echo "REFRESH_TOKEN_SECRET=test_refresh_secret_key_min_32_chars_long" >> .env.test
+          echo "JWKS_URI=http://localhost:5501/.well-known/jwks.json" >> .env.test
+          echo "PRIVATE_KEY=test_private_key" >> .env.test
 
       - name: Run unit tests
         run: npm run test:ci
