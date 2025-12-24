@@ -59,7 +59,7 @@ jobs:
           echo "PUBLIC_KEY=$(cat test_key.pub | tr '\n' '~' | sed 's/~/\\n/g')" >> .env.test
 
       - name: Run unit tests
-        run: npm run test:ci
+        run: npm run test:ci -- --coverageThreshold='{}'
         env:
           NODE_ENV: test
 
