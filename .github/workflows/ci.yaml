@@ -40,6 +40,11 @@ jobs:
       - name: Run ESLint
         run: npm run lint:fix
 
+      - name: Generate test RSA keys
+        run: |
+          ssh-keygen -t rsa -b 2048 -m PEM -f test_key -N ""
+          openssl rsa -in test_key -pubout -outform PEM -out test_key.pub
+
       - name: Create .env.test file
         run: |
           echo "NODE_ENV=test" > .env.test
@@ -50,7 +55,8 @@ jobs:
           echo "DB_NAME=test_db" >> .env.test
           echo "REFRESH_TOKEN_SECRET=test_refresh_secret_key_min_32_chars_long" >> .env.test
           echo "JWKS_URI=http://localhost:5501/.well-known/jwks.json" >> .env.test
-          echo "PRIVATE_KEY=test_private_key" >> .env.test
+          echo "PRIVATE_KEY=$(cat test_key | tr '\n' '~' | sed 's/~/\\n/g')" >> .env.test
+          echo "PUBLIC_KEY=$(cat test_key.pub | tr '\n' '~' | sed 's/~/\\n/g')" >> .env.test
 
       - name: Run unit tests
         run: npm run test:ci
