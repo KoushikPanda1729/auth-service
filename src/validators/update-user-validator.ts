@@ -1,4 +1,5 @@
 import { checkSchema } from "express-validator";
+import { roles } from "../constants";
 
 export const updateUserValidator = checkSchema({
     firstName: {
@@ -26,10 +27,13 @@ export const updateUserValidator = checkSchema({
     },
     role: {
         optional: true,
-        errorMessage: "Role must be a string",
+        trim: true,
         notEmpty: {
             errorMessage: "Role cannot be empty",
         },
-        trim: true,
+        isIn: {
+            options: [[roles.ADMIN, roles.MANAGER, roles.CUSTOMER]],
+            errorMessage: `Role must be one of: ${roles.ADMIN}, ${roles.MANAGER}, ${roles.CUSTOMER}`,
+        },
     },
 });
