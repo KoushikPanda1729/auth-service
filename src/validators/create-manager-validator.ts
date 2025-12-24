@@ -1,4 +1,5 @@
 import { checkSchema } from "express-validator";
+import { roles } from "../constants";
 
 export const createManagerValidator = checkSchema({
     email: {
@@ -36,6 +37,14 @@ export const createManagerValidator = checkSchema({
             },
             errorMessage:
                 "Password must contain at least 1 uppercase, 1 lowercase, 1 number and 1 special character",
+        },
+    },
+    role: {
+        optional: true,
+        trim: true,
+        isIn: {
+            options: [[roles.ADMIN, roles.MANAGER, roles.CUSTOMER]],
+            errorMessage: `Role must be one of: ${roles.ADMIN}, ${roles.MANAGER}, ${roles.CUSTOMER}`,
         },
     },
     tenantId: {
