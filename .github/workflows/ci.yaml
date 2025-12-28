@@ -1,101 +1,95 @@
 name: CI Pipeline
 
 on:
-  pull_request:
-    branches:
-      - main
-      - develop
-  push:
-    branches:
-      - main
-      - develop
+    pull_request:
+        branches:
+            - main
+            - develop
+    push:
+        branches:
+            - main
+            - develop
 
 jobs:
-  build-and-test:
-    name: Build and Test
-    runs-on: ubuntu-latest
+    build-and-test:
+        name: Build and Test
+        runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:16
+        services:
+            postgres:
+                image: postgres:16
+                env:
+                    POSTGRES_USER: test_user
+                    POSTGRES_PASSWORD: test_password
+                    POSTGRES_DB: test_db
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+                ports:
+                    - 5432:5432
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run ESLint
+              run: npm run lint:fix
+
+            - name: Generate test RSA keys
+              run: |
+                  ssh-keygen -t rsa -b 2048 -m PEM -f test_key -N ""
+                  openssl rsa -in test_key -pubout -outform PEM -out test_key.pub
+
+            - name: Create .env.test file
+              run: |
+                  echo "NODE_ENV=test" > .env.test
+                  echo "DB_HOST=localhost" >> .env.test
+                  echo "DB_PORT=5432" >> .env.test
+                  echo "DB_USERNAME=test_user" >> .env.test
+                  echo "DB_PASSWORD=test_password" >> .env.test
+                  echo "DB_NAME=test_db" >> .env.test
+                  echo "REFRESH_TOKEN_SECRET=test_refresh_secret_key_min_32_chars_long" >> .env.test
+                  echo "JWKS_URI=http://localhost:5501/.well-known/jwks.json" >> .env.test
+                  echo "PRIVATE_KEY=$(cat test_key | tr '\n' '~' | sed 's/~/\\n/g')" >> .env.test
+                  echo "PUBLIC_KEY=$(cat test_key.pub | tr '\n' '~' | sed 's/~/\\n/g')" >> .env.test
+
+            - name: Run unit tests
+              run: npm run test:ci -- --coverageThreshold='{}'
+              env:
+                  NODE_ENV: test
+
+            - name: Build project
+              run: npm run build
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarcloud-github-action@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    build-and-push-docker:
+        name: Build and Push Docker Image
+        needs: build-and-test
+        runs-on: ubuntu-latest
         env:
-          POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_password
-          POSTGRES_DB: test_db
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+            IMAGE_NAME: koushik172/auth-service
+            IMAGE_TAG: build-${{ github.run_number }}
+        if: github.ref == 'refs/heads/main' || github.event_name == 'push'
 
-    steps:
-      - uses: actions/checkout@v3
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: npm ci
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v2
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
 
-
-      - name: Run ESLint
-        run: npm run lint:fix
-
-      - name: Generate test RSA keys
-        run: |
-          ssh-keygen -t rsa -b 2048 -m PEM -f test_key -N ""
-          openssl rsa -in test_key -pubout -outform PEM -out test_key.pub
-
-      - name: Create .env.test file
-        run: |
-          echo "NODE_ENV=test" > .env.test
-          echo "DB_HOST=localhost" >> .env.test
-          echo "DB_PORT=5432" >> .env.test
-          echo "DB_USERNAME=test_user" >> .env.test
-          echo "DB_PASSWORD=test_password" >> .env.test
-          echo "DB_NAME=test_db" >> .env.test
-          echo "REFRESH_TOKEN_SECRET=test_refresh_secret_key_min_32_chars_long" >> .env.test
-          echo "JWKS_URI=http://localhost:5501/.well-known/jwks.json" >> .env.test
-          echo "PRIVATE_KEY=$(cat test_key | tr '\n' '~' | sed 's/~/\\n/g')" >> .env.test
-          echo "PUBLIC_KEY=$(cat test_key.pub | tr '\n' '~' | sed 's/~/\\n/g')" >> .env.test
-
-      - name: Run unit tests
-        run: npm run test:ci -- --coverageThreshold='{}'
-        env:
-          NODE_ENV: test
-
-      - name: Build project
-        run: npm run build
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-       
-  build-and-push-docker:
-    name: Build and Push Docker Image
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    env:
-       IMAGE_NAME: koushik172/auth-service
-       IMAGE_TAG: build-${{ github.run_number }}
-    if: github.ref == 'refs/heads/main' || github.event_name == 'push'
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build Docker Image
-        run: docker build -t ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} -f docker/prod/Dockerfile .
-      - name: Push Docker Image
-        run: docker push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-      
-
-
-
-
+            - name: Build Docker Image
+              run: docker build -t ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} -f docker/prod/Dockerfile .
+            - name: Push Docker Image
+              run: docker push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}

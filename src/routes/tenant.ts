@@ -34,7 +34,7 @@ tenantRouter.post(
 tenantRouter.get(
     "/",
     authenticate,
-    authorize([roles.ADMIN]),
+    authorize([roles.ADMIN, roles.MANAGER, roles.CUSTOMER]),
     (req: Request, res: Response, next: NextFunction) =>
         tenantController.getAll(req, res, next)
 );
