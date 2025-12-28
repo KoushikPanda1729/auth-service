@@ -1,6 +1,9 @@
 import type { Repository } from "typeorm";
 import { Tenant } from "../entity/Tenant";
 import createHttpError from "http-errors";
+import { AppDataSource } from "../config/data-source";
+import { User } from "../entity/User";
+import { roles } from "../constants";
 
 export interface CreateTenantData {
     name: string;
@@ -32,8 +35,30 @@ export class TenantService {
         }
     }
 
-    async findAll(limit?: number, offset?: number) {
+    async findAll(
+        limit?: number,
+        offset?: number,
+        userId?: number,
+        userRole?: string
+    ) {
         try {
+            // If user is a manager, filter by their assigned tenant
+            if (userRole === roles.MANAGER && userId) {
+                const userRepository = AppDataSource.getRepository(User);
+                const user = await userRepository.findOne({
+                    where: { id: userId },
+                    relations: ["tenant"],
+                });
+
+                if (!user || !user.tenant) {
+                    return [];
+                }
+
+                // Return only the manager's assigned tenant
+                return [user.tenant];
+            }
+
+            // For admin and customer, return all tenants
             const options: {
                 take?: number;
                 skip?: number;

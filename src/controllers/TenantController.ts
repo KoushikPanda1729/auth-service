@@ -49,7 +49,12 @@ export class TenantController {
                 ? parseInt(req.query.offset as string)
                 : undefined;
 
-            const tenants = await this.tenantService.findAll(limit, offset);
+            const tenants = await this.tenantService.findAll(
+                limit,
+                offset,
+                req.user?.sub,
+                req.user?.role
+            );
 
             this.logger.info(`Retrieved ${tenants.length} tenants`);
 
