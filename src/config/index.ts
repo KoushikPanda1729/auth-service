@@ -32,6 +32,10 @@ const {
     REFRESH_TOKEN_SECRET,
     PRIVATE_KEY,
     PUBLIC_KEY,
+    ADMIN_EMAIL,
+    ADMIN_PASSWORD,
+    ADMIN_FIRST_NAME,
+    ADMIN_LAST_NAME,
 } = process.env;
 
 // Replace literal \n with actual newlines and strip surrounding quotes from PEM keys
@@ -57,4 +61,8 @@ export const Config = {
     REFRESH_TOKEN_SECRET: REFRESH_TOKEN_SECRET || "",
     PRIVATE_KEY: privateKey,
     PUBLIC_KEY: publicKey,
+    ADMIN_EMAIL: ADMIN_EMAIL,
+    ADMIN_PASSWORD: ADMIN_PASSWORD,
+    ADMIN_FIRST_NAME: ADMIN_FIRST_NAME,
+    ADMIN_LAST_NAME: ADMIN_LAST_NAME,
 };
