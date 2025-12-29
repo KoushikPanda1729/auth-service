@@ -1,6 +1,8 @@
 import { type NextFunction, type Request, type Response } from "express";
 import type { TenantService } from "../services/TenantService";
 import type { Logger } from "winston";
+import type { PaginatedResponse } from "../types";
+import type { Tenant } from "../entity/Tenant";
 
 export interface CreateTenantRequest {
     name: string;
@@ -42,23 +44,40 @@ export class TenantController {
 
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const limit = req.query.limit
+            const perPage = req.query.limit
                 ? parseInt(req.query.limit as string)
-                : undefined;
-            const offset = req.query.offset
-                ? parseInt(req.query.offset as string)
-                : undefined;
+                : 10;
+            const currentPage = req.query.page
+                ? parseInt(req.query.page as string)
+                : 1;
 
-            const tenants = await this.tenantService.findAll(
-                limit,
+            // Calculate offset from page number
+            const offset = (currentPage - 1) * perPage;
+
+            const { tenants, total } = await this.tenantService.findAll(
+                perPage,
                 offset,
                 req.user?.sub,
                 req.user?.role
             );
 
-            this.logger.info(`Retrieved ${tenants.length} tenants`);
+            const totalPages = Math.ceil(total / perPage);
 
-            res.status(200).json(tenants);
+            const response: PaginatedResponse<Tenant> = {
+                data: tenants,
+                pagination: {
+                    total,
+                    currentPage,
+                    perPage,
+                    totalPages,
+                },
+            };
+
+            this.logger.info(
+                `Retrieved ${tenants.length} tenants out of ${total}`
+            );
+
+            res.status(200).json(response);
         } catch (error) {
             next(error);
         }

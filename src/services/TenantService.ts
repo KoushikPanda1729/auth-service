@@ -40,7 +40,7 @@ export class TenantService {
         offset?: number,
         userId?: number,
         userRole?: string
-    ) {
+    ): Promise<{ tenants: Tenant[]; total: number }> {
         try {
             // If user is a manager, filter by their assigned tenant
             if (userRole === roles.MANAGER && userId) {
@@ -51,11 +51,11 @@ export class TenantService {
                 });
 
                 if (!user || !user.tenant) {
-                    return [];
+                    return { tenants: [], total: 0 };
                 }
 
                 // Return only the manager's assigned tenant
-                return [user.tenant];
+                return { tenants: [user.tenant], total: 1 };
             }
 
             // For admin and customer, return all tenants
@@ -74,8 +74,9 @@ export class TenantService {
                 options.skip = offset;
             }
 
-            const tenants = await this.tenantRepository.find(options);
-            return tenants;
+            const [tenants, total] =
+                await this.tenantRepository.findAndCount(options);
+            return { tenants, total };
         } catch {
             const error = createHttpError(500, "Internal Server Error");
             throw error;

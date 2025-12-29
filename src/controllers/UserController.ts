@@ -1,8 +1,9 @@
 import { type NextFunction, type Request, type Response } from "express";
 import type { UserService } from "../services/Userservice";
 import type { Logger } from "winston";
-import type { RegisterBody } from "../types";
+import type { RegisterBody, PaginatedResponse } from "../types";
 import createHttpError from "http-errors";
+import type { User } from "../entity/User";
 
 export class UserController {
     private userService: UserService;
@@ -15,11 +16,36 @@ export class UserController {
 
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const users = await this.userService.getAll();
+            const perPage = req.query.limit
+                ? parseInt(req.query.limit as string)
+                : 10;
+            const currentPage = req.query.page
+                ? parseInt(req.query.page as string)
+                : 1;
 
-            this.logger.info("Retrieved all users");
+            // Calculate offset from page number
+            const offset = (currentPage - 1) * perPage;
 
-            res.status(200).json(users);
+            const { users, total } = await this.userService.getAll(
+                perPage,
+                offset
+            );
+
+            const totalPages = Math.ceil(total / perPage);
+
+            const response: PaginatedResponse<User> = {
+                data: users,
+                pagination: {
+                    total,
+                    currentPage,
+                    perPage,
+                    totalPages,
+                },
+            };
+
+            this.logger.info(`Retrieved ${users.length} users out of ${total}`);
+
+            res.status(200).json(response);
         } catch (error) {
             next(error);
         }

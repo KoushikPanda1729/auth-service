@@ -82,10 +82,30 @@ export class UserService {
         return await bcrypt.compare(plainPassword, hashedPassword);
     }
 
-    async getAll(): Promise<User[]> {
-        return await this.userRepository.find({
+    async getAll(
+        limit?: number,
+        offset?: number
+    ): Promise<{ users: User[]; total: number }> {
+        const options: {
+            select?: (keyof User)[];
+            take?: number;
+            skip?: number;
+            order?: { id: "ASC" };
+        } = {
             select: ["id", "firstName", "lastName", "email", "role"],
-        });
+            order: { id: "ASC" },
+        };
+
+        if (limit !== undefined) {
+            options.take = limit;
+        }
+        if (offset !== undefined) {
+            options.skip = offset;
+        }
+
+        const [users, total] = await this.userRepository.findAndCount(options);
+
+        return { users, total };
     }
 
     async update(

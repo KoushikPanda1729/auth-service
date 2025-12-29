@@ -18,6 +18,18 @@ export interface AuthPayload {
     id?: number;
 }
 
+export interface PaginationMetadata {
+    total: number;
+    currentPage: number;
+    perPage: number;
+    totalPages: number;
+}
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    pagination: PaginationMetadata;
+}
+
 declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Express {
