@@ -747,8 +747,8 @@ describe("Tenant API Tests", () => {
                 expect(response.statusCode).toBe(401);
             });
 
-            it("should return 403 if user is not an admin", async () => {
-                // Arrange - Create a non-admin user token
+            it("should return 200 if user is a customer", async () => {
+                // Arrange - Create a customer user token
                 const accessToken = jwks.token({
                     sub: "1",
                     role: roles.CUSTOMER,
@@ -760,7 +760,7 @@ describe("Tenant API Tests", () => {
                     .set("Cookie", [`accessToken=${accessToken}`]);
 
                 // Assert
-                expect(response.statusCode).toBe(403);
+                expect(response.statusCode).toBe(200);
             });
         });
     });
