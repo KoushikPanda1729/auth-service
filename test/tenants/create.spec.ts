@@ -609,7 +609,13 @@ describe("Tenant API Tests", () => {
                     .set("Cookie", [`accessToken=${accessToken}`]);
 
                 // Assert
-                expect(response.body).toEqual([]);
+                expect(response.body.data).toEqual([]);
+                expect(response.body.pagination).toEqual({
+                    total: 0,
+                    currentPage: 1,
+                    perPage: 10,
+                    totalPages: 0,
+                });
             });
 
             it("should return all tenants when they exist", async () => {
@@ -632,7 +638,13 @@ describe("Tenant API Tests", () => {
                     .set("Cookie", [`accessToken=${accessToken}`]);
 
                 // Assert
-                expect(response.body).toHaveLength(3);
+                expect(response.body.data).toHaveLength(3);
+                expect(response.body.pagination).toEqual({
+                    total: 3,
+                    currentPage: 1,
+                    perPage: 10,
+                    totalPages: 1,
+                });
             });
 
             it("should return tenants with all properties", async () => {
@@ -654,11 +666,11 @@ describe("Tenant API Tests", () => {
                     .set("Cookie", [`accessToken=${accessToken}`]);
 
                 // Assert
-                expect(response.body[0]).toHaveProperty("id");
-                expect(response.body[0]).toHaveProperty("name");
-                expect(response.body[0]).toHaveProperty("address");
-                expect(response.body[0]).toHaveProperty("createdAt");
-                expect(response.body[0]).toHaveProperty("updatedAt");
+                expect(response.body.data[0]).toHaveProperty("id");
+                expect(response.body.data[0]).toHaveProperty("name");
+                expect(response.body.data[0]).toHaveProperty("address");
+                expect(response.body.data[0]).toHaveProperty("createdAt");
+                expect(response.body.data[0]).toHaveProperty("updatedAt");
             });
 
             it("should return tenants ordered by id", async () => {
@@ -682,8 +694,12 @@ describe("Tenant API Tests", () => {
                     .set("Cookie", [`accessToken=${accessToken}`]);
 
                 // Assert
-                expect(response.body[0].id).toBeLessThan(response.body[1].id);
-                expect(response.body[1].id).toBeLessThan(response.body[2].id);
+                expect(response.body.data[0].id).toBeLessThan(
+                    response.body.data[1].id
+                );
+                expect(response.body.data[1].id).toBeLessThan(
+                    response.body.data[2].id
+                );
             });
         });
 
@@ -710,7 +726,13 @@ describe("Tenant API Tests", () => {
                     .set("Cookie", [`accessToken=${accessToken}`]);
 
                 // Assert
-                expect(response.body).toHaveLength(2);
+                expect(response.body.data).toHaveLength(2);
+                expect(response.body.pagination).toEqual({
+                    total: 5,
+                    currentPage: 1,
+                    perPage: 2,
+                    totalPages: 3,
+                });
             });
 
             it("should support offset parameter", async () => {
@@ -733,8 +755,14 @@ describe("Tenant API Tests", () => {
                     .set("Cookie", [`accessToken=${accessToken}`]);
 
                 // Assert
-                expect(response.body).toHaveLength(2);
-                expect(response.body[0].name).toBe("Tenant 2");
+                expect(response.body.data).toHaveLength(2);
+                expect(response.body.data[0].name).toBe("Tenant 2");
+                expect(response.body.pagination).toEqual({
+                    total: 3,
+                    currentPage: 1,
+                    perPage: 10,
+                    totalPages: 1,
+                });
             });
         });
 

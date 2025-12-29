@@ -47,12 +47,22 @@ export class TenantController {
             const perPage = req.query.limit
                 ? parseInt(req.query.limit as string)
                 : 10;
-            const currentPage = req.query.page
-                ? parseInt(req.query.page as string)
-                : 1;
 
-            // Calculate offset from page number
-            const offset = (currentPage - 1) * perPage;
+            // Support both page and offset parameters
+            let offset: number;
+            let currentPage: number;
+
+            if (req.query.offset !== undefined) {
+                // If offset is provided, use it directly
+                offset = parseInt(req.query.offset as string);
+                currentPage = Math.floor(offset / perPage) + 1;
+            } else {
+                // Otherwise, calculate offset from page number
+                currentPage = req.query.page
+                    ? parseInt(req.query.page as string)
+                    : 1;
+                offset = (currentPage - 1) * perPage;
+            }
 
             const { tenants, total } = await this.tenantService.findAll(
                 perPage,

@@ -114,8 +114,14 @@ describe("User Management Endpoints", () => {
                     .set("Cookie", [`accessToken=${adminToken}`]);
 
                 // Assert
-                expect(Array.isArray(response.body)).toBe(true);
-                expect(response.body).toHaveLength(2);
+                expect(Array.isArray(response.body.data)).toBe(true);
+                expect(response.body.data).toHaveLength(2);
+                expect(response.body.pagination).toEqual({
+                    total: 2,
+                    currentPage: 1,
+                    perPage: 10,
+                    totalPages: 1,
+                });
             });
 
             it("should return users with required fields", async () => {
@@ -140,11 +146,11 @@ describe("User Management Endpoints", () => {
                     .set("Cookie", [`accessToken=${adminToken}`]);
 
                 // Assert
-                expect(response.body[0]).toHaveProperty("id");
-                expect(response.body[0]).toHaveProperty("firstName");
-                expect(response.body[0]).toHaveProperty("lastName");
-                expect(response.body[0]).toHaveProperty("email");
-                expect(response.body[0]).toHaveProperty("role");
+                expect(response.body.data[0]).toHaveProperty("id");
+                expect(response.body.data[0]).toHaveProperty("firstName");
+                expect(response.body.data[0]).toHaveProperty("lastName");
+                expect(response.body.data[0]).toHaveProperty("email");
+                expect(response.body.data[0]).toHaveProperty("role");
             });
 
             it("should not return password field", async () => {
@@ -169,7 +175,7 @@ describe("User Management Endpoints", () => {
                     .set("Cookie", [`accessToken=${adminToken}`]);
 
                 // Assert
-                expect(response.body[0]).not.toHaveProperty("password");
+                expect(response.body.data[0]).not.toHaveProperty("password");
             });
         });
 
