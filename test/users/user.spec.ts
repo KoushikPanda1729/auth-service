@@ -12,6 +12,7 @@ import { DataSource } from "typeorm";
 import app from "../../src/app";
 import { AppDataSource } from "../../src/config/data-source";
 import { User } from "../../src/entity/User";
+import { Tenant } from "../../src/entity/Tenant";
 import mockJWKS from "mock-jwks";
 import { Config } from "../../src/config";
 import { roles } from "../../src/constants";
@@ -585,6 +586,14 @@ describe("User Management Endpoints", () => {
             it("should update user role", async () => {
                 // Arrange
                 const userRepository = connection.getRepository(User);
+                const tenantRepository = connection.getRepository(Tenant);
+
+                // Create a tenant first
+                const tenant = await tenantRepository.save({
+                    name: "Test Tenant",
+                    address: "Test Address",
+                });
+
                 const savedUser = await userRepository.save({
                     firstName: "John",
                     lastName: "Doe",
@@ -595,6 +604,7 @@ describe("User Management Endpoints", () => {
 
                 const updateData = {
                     role: roles.MANAGER,
+                    tenantId: tenant.id, // Manager requires tenantId
                 };
 
                 const adminToken = jwks.token({
@@ -611,8 +621,10 @@ describe("User Management Endpoints", () => {
                 // Assert
                 const updatedUser = await userRepository.findOne({
                     where: { id: savedUser.id },
+                    relations: ["tenant"],
                 });
                 expect(updatedUser?.role).toBe(roles.MANAGER);
+                expect(updatedUser?.tenant?.id).toBe(tenant.id);
             });
         });
 
