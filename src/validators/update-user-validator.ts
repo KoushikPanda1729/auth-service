@@ -36,4 +36,34 @@ export const updateUserValidator = checkSchema({
             errorMessage: `Role must be one of: ${roles.ADMIN}, ${roles.MANAGER}, ${roles.CUSTOMER}`,
         },
     },
+    tenantId: {
+        optional: true,
+        custom: {
+            options: (value, { req }) => {
+                const role = (req.body as { role?: string }).role;
+
+                // If role is being changed to manager, tenantId is required
+                if (role === roles.MANAGER && value === null) {
+                    throw new Error(
+                        "Tenant ID is required when role is manager"
+                    );
+                }
+
+                // If tenantId is provided, it should be a valid integer or null
+                if (value !== null && value !== undefined) {
+                    if (
+                        !Number.isInteger(Number(value)) ||
+                        Number(value) <= 0
+                    ) {
+                        throw new Error(
+                            "Tenant ID must be a valid positive integer"
+                        );
+                    }
+                }
+
+                return true;
+            },
+        },
+        toInt: true,
+    },
 });

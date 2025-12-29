@@ -48,11 +48,29 @@ export const createManagerValidator = checkSchema({
         },
     },
     tenantId: {
-        errorMessage: "Tenant ID is required",
-        notEmpty: true,
-        isNumeric: {
-            errorMessage: "Tenant ID must be a number",
+        optional: true,
+        isInt: {
+            errorMessage: "Tenant ID must be a valid integer",
         },
         toInt: true,
+        custom: {
+            options: (value, { req }) => {
+                const role = (req.body as { role?: string }).role;
+                // If role is manager, tenantId is required
+                if (role === roles.MANAGER && !value) {
+                    throw new Error("Tenant ID is required for manager role");
+                }
+                // If role is admin or customer, tenantId should not be provided
+                if (
+                    (role === roles.ADMIN || role === roles.CUSTOMER) &&
+                    value
+                ) {
+                    throw new Error(
+                        "Tenant ID should not be provided for admin or customer role"
+                    );
+                }
+                return true;
+            },
+        },
     },
 });

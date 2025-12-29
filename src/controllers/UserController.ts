@@ -88,7 +88,7 @@ export class UserController {
 
     async update(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params;
-        const { firstName, lastName, email, role } =
+        const { firstName, lastName, email, role, tenantId } =
             req.body as Partial<RegisterBody>;
 
         // Validate ID is a number
@@ -99,12 +99,13 @@ export class UserController {
         try {
             const updateData: Partial<
                 Pick<RegisterBody, "firstName" | "lastName" | "email" | "role">
-            > = {};
+            > & { tenantId?: number | null } = {};
 
             if (firstName) updateData.firstName = firstName;
             if (lastName) updateData.lastName = lastName;
             if (email) updateData.email = email;
             if (role) updateData.role = role;
+            if (tenantId !== undefined) updateData.tenantId = tenantId;
 
             const updatedUser = await this.userService.update(
                 Number(id),
