@@ -10,6 +10,7 @@ import { TenantController } from "../controllers/TenantController";
 import { Tenant } from "../entity/Tenant";
 import { TenantService } from "../services/TenantService";
 import { createTenantValidator } from "../validators/tenant-validator";
+import { tenantQueryValidator } from "../validators/tenant-query-validator";
 import { validateRequest } from "../validators/validate-request";
 import { authenticate } from "../middleware/authenticate";
 import { authorize } from "../middleware/authorize";
@@ -35,6 +36,8 @@ tenantRouter.get(
     "/",
     authenticate,
     authorize([roles.ADMIN, roles.MANAGER, roles.CUSTOMER]),
+    tenantQueryValidator,
+    validateRequest,
     (req: Request, res: Response, next: NextFunction) =>
         tenantController.getAll(req, res, next)
 );

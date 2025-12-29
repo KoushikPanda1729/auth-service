@@ -1,4 +1,5 @@
 import { type NextFunction, type Request, type Response } from "express";
+import { matchedData } from "express-validator";
 import type { TenantService } from "../services/TenantService";
 import type { Logger } from "winston";
 import type { PaginatedResponse } from "../types";
@@ -44,37 +45,31 @@ export class TenantController {
 
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const perPage = req.query.limit
-                ? parseInt(req.query.limit as string)
-                : 10;
+            // Get validated and sanitized data
+            const queryData = matchedData(req, { locations: ["query"] });
+
+            const perPage = (queryData.limit as number) || 10;
 
             // Support both page and offset parameters
             let offset: number;
             let currentPage: number;
 
-            if (req.query.offset !== undefined) {
+            if (queryData.offset !== undefined) {
                 // If offset is provided, use it directly
-                offset = parseInt(req.query.offset as string);
+                offset = queryData.offset as number;
                 currentPage = Math.floor(offset / perPage) + 1;
             } else {
                 // Otherwise, calculate offset from page number
-                currentPage = req.query.page
-                    ? parseInt(req.query.page as string)
-                    : 1;
+                currentPage = (queryData.page as number) || 1;
                 offset = (currentPage - 1) * perPage;
             }
-
-            // Extract search parameter
-            const searchQuery = req.query.search
-                ? (req.query.search as string)
-                : undefined;
 
             const { tenants, total } = await this.tenantService.findAll(
                 perPage,
                 offset,
                 req.user?.sub,
                 req.user?.role,
-                searchQuery
+                queryData.search as string | undefined
             );
 
             const totalPages = Math.ceil(total / perPage);

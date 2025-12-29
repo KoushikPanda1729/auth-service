@@ -1,4 +1,5 @@
 import { type NextFunction, type Request, type Response } from "express";
+import { matchedData } from "express-validator";
 import type { UserService } from "../services/Userservice";
 import type { Logger } from "winston";
 import type { RegisterBody, PaginatedResponse } from "../types";
@@ -16,39 +17,30 @@ export class UserController {
 
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const perPage = req.query.limit
-                ? parseInt(req.query.limit as string)
-                : 10;
+            // Get validated and sanitized data
+            const queryData = matchedData(req, { locations: ["query"] });
+
+            const perPage = (queryData.limit as number) || 10;
 
             // Support both page and offset parameters
             let offset: number;
             let currentPage: number;
 
-            if (req.query.offset !== undefined) {
+            if (queryData.offset !== undefined) {
                 // If offset is provided, use it directly
-                offset = parseInt(req.query.offset as string);
+                offset = queryData.offset as number;
                 currentPage = Math.floor(offset / perPage) + 1;
             } else {
                 // Otherwise, calculate offset from page number
-                currentPage = req.query.page
-                    ? parseInt(req.query.page as string)
-                    : 1;
+                currentPage = (queryData.page as number) || 1;
                 offset = (currentPage - 1) * perPage;
             }
-
-            // Extract search and filter parameters
-            const searchQuery = req.query.search
-                ? (req.query.search as string)
-                : undefined;
-            const role = req.query.role
-                ? (req.query.role as string)
-                : undefined;
 
             const { users, total } = await this.userService.getAll(
                 perPage,
                 offset,
-                searchQuery,
-                role
+                queryData.search as string | undefined,
+                queryData.role as string | undefined
             );
 
             const totalPages = Math.ceil(total / perPage);

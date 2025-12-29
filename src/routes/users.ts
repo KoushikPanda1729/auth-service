@@ -14,6 +14,7 @@ import { RefreshToken } from "../entity/RefreshToken";
 import { TokenService } from "../services/TokenService";
 import { createManagerValidator } from "../validators/create-manager-validator";
 import { updateUserValidator } from "../validators/update-user-validator";
+import { userQueryValidator } from "../validators/user-query-validator";
 import { validateRequest } from "../validators/validate-request";
 import { authenticate } from "../middleware/authenticate";
 import { authorize } from "../middleware/authorize";
@@ -35,6 +36,8 @@ usersRouter.get(
     "/",
     authenticate,
     authorize([roles.ADMIN]),
+    userQueryValidator,
+    validateRequest,
     (req: Request, res: Response, next: NextFunction) =>
         userController.getAll(req, res, next)
 );

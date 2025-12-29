@@ -99,10 +99,10 @@ export class UserService {
             ])
             .orderBy("user.id", "ASC");
 
-        // Apply search filter
+        // Apply search filter (case-insensitive)
         if (searchQuery) {
             queryBuilder.andWhere(
-                "(user.firstName LIKE :search OR user.lastName LIKE :search OR user.email LIKE :search)",
+                "(user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.email ILIKE :search)",
                 { search: `%${searchQuery}%` }
             );
         }

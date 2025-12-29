@@ -80,10 +80,10 @@ export class TenantService {
                 .createQueryBuilder("tenant")
                 .orderBy("tenant.id", "ASC");
 
-            // Apply search filter
+            // Apply search filter (case-insensitive)
             if (searchQuery) {
                 queryBuilder.andWhere(
-                    "(tenant.name LIKE :search OR tenant.address LIKE :search)",
+                    "(tenant.name ILIKE :search OR tenant.address ILIKE :search)",
                     { search: `%${searchQuery}%` }
                 );
             }
