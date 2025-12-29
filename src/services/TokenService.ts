@@ -16,7 +16,7 @@ export class TokenService {
                 Config.PRIVATE_KEY,
                 {
                     algorithm: "RS256",
-                    expiresIn: "1m",
+                    expiresIn: "1d",
                 }
             );
             return token;
@@ -39,7 +39,7 @@ export class TokenService {
         };
         const token = jwt.sign(payload, Config.REFRESH_TOKEN_SECRET, {
             algorithm: "HS256",
-            expiresIn: "1m",
+            expiresIn: "1y",
             jwtid: String(refreshToken.id),
         });
         return token;
