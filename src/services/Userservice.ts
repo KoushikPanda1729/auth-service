@@ -84,26 +84,43 @@ export class UserService {
 
     async getAll(
         limit?: number,
-        offset?: number
+        offset?: number,
+        searchQuery?: string,
+        role?: string
     ): Promise<{ users: User[]; total: number }> {
-        const options: {
-            select?: (keyof User)[];
-            take?: number;
-            skip?: number;
-            order?: { id: "ASC" };
-        } = {
-            select: ["id", "firstName", "lastName", "email", "role"],
-            order: { id: "ASC" },
-        };
+        const queryBuilder = this.userRepository
+            .createQueryBuilder("user")
+            .select([
+                "user.id",
+                "user.firstName",
+                "user.lastName",
+                "user.email",
+                "user.role",
+            ])
+            .orderBy("user.id", "ASC");
 
+        // Apply search filter
+        if (searchQuery) {
+            queryBuilder.andWhere(
+                "(user.firstName LIKE :search OR user.lastName LIKE :search OR user.email LIKE :search)",
+                { search: `%${searchQuery}%` }
+            );
+        }
+
+        // Apply role filter
+        if (role) {
+            queryBuilder.andWhere("user.role = :role", { role });
+        }
+
+        // Apply pagination
         if (limit !== undefined) {
-            options.take = limit;
+            queryBuilder.take(limit);
         }
         if (offset !== undefined) {
-            options.skip = offset;
+            queryBuilder.skip(offset);
         }
 
-        const [users, total] = await this.userRepository.findAndCount(options);
+        const [users, total] = await queryBuilder.getManyAndCount();
 
         return { users, total };
     }

@@ -64,11 +64,17 @@ export class TenantController {
                 offset = (currentPage - 1) * perPage;
             }
 
+            // Extract search parameter
+            const searchQuery = req.query.search
+                ? (req.query.search as string)
+                : undefined;
+
             const { tenants, total } = await this.tenantService.findAll(
                 perPage,
                 offset,
                 req.user?.sub,
-                req.user?.role
+                req.user?.role,
+                searchQuery
             );
 
             const totalPages = Math.ceil(total / perPage);

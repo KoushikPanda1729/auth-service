@@ -36,9 +36,19 @@ export class UserController {
                 offset = (currentPage - 1) * perPage;
             }
 
+            // Extract search and filter parameters
+            const searchQuery = req.query.search
+                ? (req.query.search as string)
+                : undefined;
+            const role = req.query.role
+                ? (req.query.role as string)
+                : undefined;
+
             const { users, total } = await this.userService.getAll(
                 perPage,
-                offset
+                offset,
+                searchQuery,
+                role
             );
 
             const totalPages = Math.ceil(total / perPage);

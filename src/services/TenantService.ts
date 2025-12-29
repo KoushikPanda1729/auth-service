@@ -39,7 +39,8 @@ export class TenantService {
         limit?: number,
         offset?: number,
         userId?: number,
-        userRole?: string
+        userRole?: string,
+        searchQuery?: string
     ): Promise<{ tenants: Tenant[]; total: number }> {
         try {
             // If user is a manager, filter by their assigned tenant
@@ -54,28 +55,48 @@ export class TenantService {
                     return { tenants: [], total: 0 };
                 }
 
+                // Apply search filter to manager's tenant
+                if (searchQuery) {
+                    const tenant = user.tenant;
+                    const matchesSearch =
+                        tenant.name
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase()) ||
+                        tenant.address
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase());
+
+                    if (!matchesSearch) {
+                        return { tenants: [], total: 0 };
+                    }
+                }
+
                 // Return only the manager's assigned tenant
                 return { tenants: [user.tenant], total: 1 };
             }
 
-            // For admin and customer, return all tenants
-            const options: {
-                take?: number;
-                skip?: number;
-                order: { id: "ASC" };
-            } = {
-                order: { id: "ASC" },
-            };
+            // For admin and customer, return all tenants with search
+            const queryBuilder = this.tenantRepository
+                .createQueryBuilder("tenant")
+                .orderBy("tenant.id", "ASC");
 
+            // Apply search filter
+            if (searchQuery) {
+                queryBuilder.andWhere(
+                    "(tenant.name LIKE :search OR tenant.address LIKE :search)",
+                    { search: `%${searchQuery}%` }
+                );
+            }
+
+            // Apply pagination
             if (limit !== undefined) {
-                options.take = limit;
+                queryBuilder.take(limit);
             }
             if (offset !== undefined) {
-                options.skip = offset;
+                queryBuilder.skip(offset);
             }
 
-            const [tenants, total] =
-                await this.tenantRepository.findAndCount(options);
+            const [tenants, total] = await queryBuilder.getManyAndCount();
             return { tenants, total };
         } catch {
             const error = createHttpError(500, "Internal Server Error");
