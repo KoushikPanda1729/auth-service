@@ -90,12 +90,16 @@ export class UserService {
     ): Promise<{ users: User[]; total: number }> {
         const queryBuilder = this.userRepository
             .createQueryBuilder("user")
+            .leftJoinAndSelect("user.tenant", "tenant")
             .select([
                 "user.id",
                 "user.firstName",
                 "user.lastName",
                 "user.email",
                 "user.role",
+                "tenant.id",
+                "tenant.name",
+                "tenant.address",
             ])
             .orderBy("user.id", "ASC");
 
