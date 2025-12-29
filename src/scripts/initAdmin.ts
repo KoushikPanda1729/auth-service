@@ -37,10 +37,7 @@ export const initializeAdmin = async () => {
 
         // Create admin user
         const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(
-            ADMIN_PASSWORD,
-            saltRounds
-        );
+        const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, saltRounds);
 
         const admin = userRepository.create({
             firstName: ADMIN_FIRST_NAME,
