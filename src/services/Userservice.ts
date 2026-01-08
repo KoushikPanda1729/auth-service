@@ -71,7 +71,14 @@ export class UserService {
                 role: userRole,
                 ...(tenantId && { tenant: { id: tenantId } }),
             });
-            return newUser;
+
+            // Reload user with tenant relation
+            const userWithTenant = await userRepository.findOne({
+                where: { id: newUser.id },
+                relations: ["tenant"],
+            });
+
+            return userWithTenant || newUser;
         } catch {
             const error = createHttpError(500, "Internal Server Error");
             throw error;
@@ -81,6 +88,7 @@ export class UserService {
     async findByEmail(email: string): Promise<User | null> {
         return await this.userRepository.findOne({
             where: { email },
+            relations: ["tenant"],
         });
     }
 

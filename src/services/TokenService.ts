@@ -11,14 +11,24 @@ export class TokenService {
 
     generateAccessToken(user: User): string {
         try {
-            const token = jwt.sign(
-                { sub: user.id, role: user.role },
-                Config.PRIVATE_KEY,
-                {
-                    algorithm: "RS256",
-                    expiresIn: "1d",
-                }
-            );
+            const payload: {
+                sub: number;
+                role: string;
+                tenant?: number;
+            } = {
+                sub: user.id,
+                role: user.role,
+            };
+
+            // Only add tenant if user has one (managers only)
+            if (user.tenant && user.tenant.id) {
+                payload.tenant = user.tenant.id;
+            }
+
+            const token = jwt.sign(payload, Config.PRIVATE_KEY, {
+                algorithm: "RS256",
+                expiresIn: "1d",
+            });
             return token;
         } catch {
             const error = createHttpError(500, "Error reading private key");
@@ -83,7 +93,7 @@ export class TokenService {
     async validateRefreshToken(tokenId: number): Promise<RefreshToken> {
         const token = await this.refreshTokenReposity.findOne({
             where: { id: tokenId },
-            relations: ["user"],
+            relations: ["user", "user.tenant"],
         });
 
         if (!token) {
