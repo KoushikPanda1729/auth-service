@@ -16,6 +16,10 @@ export interface AuthPayload {
     sub: number;
     role: string;
     id?: number;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    tenant?: number;
 }
 
 export interface PaginationMetadata {

@@ -14,10 +14,16 @@ export class TokenService {
             const payload: {
                 sub: number;
                 role: string;
+                firstName: string;
+                lastName: string;
+                email: string;
                 tenant?: number;
             } = {
                 sub: user.id,
                 role: user.role,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
             };
 
             // Only add tenant if user has one (managers only)
