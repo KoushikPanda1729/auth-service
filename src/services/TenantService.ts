@@ -141,6 +141,20 @@ export class TenantService {
     async delete(id: number) {
         try {
             const tenant = await this.findById(id);
+
+            // Check if tenant has associated users
+            const userRepository = AppDataSource.getRepository(User);
+            const userCount = await userRepository.count({
+                where: { tenant: { id } },
+            });
+
+            if (userCount > 0) {
+                throw createHttpError(
+                    409,
+                    "Cannot delete tenant with associated users. Remove or reassign users first."
+                );
+            }
+
             await this.tenantRepository.remove(tenant);
         } catch (error) {
             if (error instanceof Error && "statusCode" in error) {
