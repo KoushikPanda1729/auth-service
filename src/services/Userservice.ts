@@ -3,6 +3,7 @@ import type { Repository } from "typeorm";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entity/User";
 import { Tenant } from "../entity/Tenant";
+import { RefreshToken } from "../entity/RefreshToken";
 import type { RegisterBody } from "../types";
 import createHttpError from "http-errors";
 import { roles } from "../constants";
@@ -254,6 +255,11 @@ export class UserService {
         }
 
         try {
+            // Delete associated refresh tokens first
+            const refreshTokenRepository =
+                AppDataSource.getRepository(RefreshToken);
+            await refreshTokenRepository.delete({ user: { id } });
+
             await this.userRepository.remove(user);
         } catch {
             throw createHttpError(500, "Internal Server Error");
