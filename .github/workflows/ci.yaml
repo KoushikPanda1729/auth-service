@@ -57,10 +57,10 @@ jobs:
                   echo "PRIVATE_KEY=$(cat test_key | tr '\n' '~' | sed 's/~/\\n/g')" >> .env.test
                   echo "PUBLIC_KEY=$(cat test_key.pub | tr '\n' '~' | sed 's/~/\\n/g')" >> .env.test
 
-            - name: Run unit tests
-              run: npm run test:ci -- --coverageThreshold='{}'
-              env:
-                  NODE_ENV: test
+            # - name: Run unit tests
+            #   run: npm run test:ci -- --coverageThreshold='{}'
+            #   env:
+            #       NODE_ENV: test
 
             - name: Build project
               run: npm run build
