@@ -5,6 +5,7 @@ import type { TokenService } from "../services/TokenService";
 import type { Logger } from "winston";
 import createHttpError from "http-errors";
 import { roles } from "../constants";
+import { Config } from "../config";
 
 export class AuthController {
     private userService: UserService;
@@ -27,12 +28,14 @@ export class AuthController {
         refreshToken: string
     ): void {
         res.cookie("accessToken", accessToken, {
+            domain: Config.COOKIE_DOMAIN,
             httpOnly: true,
             sameSite: "strict",
             maxAge: 60 * 60 * 1000,
         });
 
         res.cookie("refreshToken", refreshToken, {
+            domain: Config.COOKIE_DOMAIN,
             httpOnly: true,
             sameSite: "strict",
             maxAge: 365 * 24 * 60 * 60 * 1000,
