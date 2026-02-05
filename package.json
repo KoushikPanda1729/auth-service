@@ -20,7 +20,9 @@
         "migration:run": "cross-env NODE_ENV=dev tsx ./node_modules/typeorm/cli.js migration:run -d ./src/config/data-source.ts",
         "migration:run:prod": "cross-env NODE_ENV=prod tsx ./node_modules/typeorm/cli.js migration:run -d ./src/config/data-source.ts",
         "migration:revert": "cross-env NODE_ENV=dev tsx ./node_modules/typeorm/cli.js migration:revert -d ./src/config/data-source.ts",
-        "migration:create": "cross-env NODE_ENV=dev tsx ./node_modules/typeorm/cli.js migration:create"
+        "migration:create": "cross-env NODE_ENV=dev tsx ./node_modules/typeorm/cli.js migration:create",
+        "migration:supabase": "node scripts/run-migration.js run",
+        "migration:supabase:revert": "node scripts/run-migration.js revert"
     },
     "keywords": [
         "Auth",
